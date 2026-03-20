@@ -1,13 +1,8 @@
-// ============================================================
-// claude.js — CV analysis via Anthropic Claude Haiku (cost-optimized)
-// ============================================================
-import Anthropic from '@anthropic-ai/sdk';
-import mammoth   from 'mammoth';
+const Anthropic = require('@anthropic-ai/sdk');
+const mammoth   = require('mammoth');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// Weighted categories for ATS scoring (weights must sum to 100)
-// Kept in prompt as concise instructions to minimize tokens
 function buildPrompt(puesto) {
   const puestoLine = puesto
     ? `El candidato busca el puesto: "${puesto}". Evaluá keywords y logros en relación a ese rol específico.`
@@ -28,7 +23,7 @@ Analizá el CV adjunto y devolvé SOLO JSON válido. Toda la información debe s
     {"nombre":"Datos de contacto","peso":10,"puntaje":<0-100>,"nota":"<10 palabras max>"}
   ],
   "errores": [
-    {"categoria":"<keywords|formato|estructura|logros|contacto>","descripcion":"<descripción concreta que cite elementos reales del CV, ej: 'La sección Experiencia usa tablas que los ATS no pueden leer' o 'No hay ningún número en los 3 trabajos listados'>","impacto":"<alto|medio|bajo>"}
+    {"categoria":"<keywords|formato|estructura|logros|contacto>","descripcion":"<descripción concreta que cite elementos reales del CV>","impacto":"<alto|medio|bajo>"}
   ],
   "keywords_faltantes": ["<keyword real del sector/rol que NO aparece en el CV>"],
   "fortalezas": ["<f1>","<f2>"]
@@ -36,12 +31,12 @@ Analizá el CV adjunto y devolvé SOLO JSON válido. Toda la información debe s
 
 Reglas:
 - score = suma(puntaje * peso / 100). Mayoría de CVs entre 20-55.
-- Max 6 errores. Cada descripción de error debe ser específica al CV leído, no una frase genérica.
-- keywords_faltantes: listá entre 4 y 7 términos técnicos o habilidades del rol que estén ausentes en el texto del CV. No inventes keywords genéricas.
+- Max 6 errores. Cada descripción debe ser específica al CV, no genérica.
+- keywords_faltantes: entre 4 y 7 términos técnicos ausentes en el CV. No inventes keywords genéricas.
 - Respondé en español.`;
 }
 
-export async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
+async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
   const isPdf = mimetype === 'application/pdf' || originalname.toLowerCase().endsWith('.pdf');
   const prompt = buildPrompt(puesto);
 
@@ -54,10 +49,7 @@ export async function analyzeCV(fileBuffer, mimetype, originalname, puesto = nul
       messages: [{
         role: 'user',
         content: [
-          {
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: fileBuffer.toString('base64') },
-          },
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fileBuffer.toString('base64') } },
           { type: 'text', text: prompt },
         ],
       }],
@@ -75,14 +67,12 @@ export async function analyzeCV(fileBuffer, mimetype, originalname, puesto = nul
       throw new Error('El archivo parece estar vacío o no contiene texto legible.');
     }
 
-    const truncated = extractedText.slice(0, 3000);
-
     message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1200,
       messages: [{
         role: 'user',
-        content: `${prompt}\n\n---CV---\n${truncated}`,
+        content: `${prompt}\n\n---CV---\n${extractedText.slice(0, 3000)}`,
       }],
     });
   }
@@ -90,12 +80,11 @@ export async function analyzeCV(fileBuffer, mimetype, originalname, puesto = nul
   const rawText = message.content[0]?.text ?? '';
   const cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
 
-  let parsed;
   try {
-    parsed = JSON.parse(cleaned);
+    return JSON.parse(cleaned);
   } catch {
     throw new Error('Claude devolvió una respuesta inválida. Intentá de nuevo.');
   }
-
-  return parsed;
 }
+
+module.exports = { analyzeCV };
