@@ -3105,6 +3105,9 @@
     // -----------------------------------------------
     const API_URL = 'https://rumbo-six.vercel.app';
 
+    // Track page visit (CAPI PageView)
+    fetch(`${API_URL}/api/track/visit`, { method: 'POST' }).catch(() => {});
+
     // Session ID returned by the backend after analysis
     let currentSession = null;
 
