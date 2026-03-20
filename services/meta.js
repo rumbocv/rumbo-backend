@@ -1,9 +1,6 @@
 const crypto = require('crypto');
 
-const PIXEL_ID     = process.env.META_PIXEL_ID;
-const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
-const API_VERSION  = 'v19.0';
-const ENDPOINT     = `https://graph.facebook.com/${API_VERSION}/${PIXEL_ID}/events`;
+const API_VERSION = 'v19.0';
 
 function hash(value) {
   if (!value) return undefined;
@@ -11,17 +8,22 @@ function hash(value) {
 }
 
 async function sendMetaEvent(eventName, opts = {}) {
+  const PIXEL_ID     = process.env.META_PIXEL_ID;
+  const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+
   if (!PIXEL_ID || !ACCESS_TOKEN) {
-    console.warn('[meta] Credenciales no configuradas — evento omitido.');
-    return;
+    console.warn('[meta] Credenciales no configuradas — META_PIXEL_ID:', !!PIXEL_ID, 'META_ACCESS_TOKEN:', !!ACCESS_TOKEN);
+    return null;
   }
 
+  const ENDPOINT = `https://graph.facebook.com/${API_VERSION}/${PIXEL_ID}/events`;
+
   const userData = {
-    em:                 hash(opts.email),
-    client_ip_address:  opts.ip,
-    client_user_agent:  opts.userAgent,
-    fbp:                opts.fbp,
-    fbc:                opts.fbc,
+    em:                hash(opts.email),
+    client_ip_address: opts.ip,
+    client_user_agent: opts.userAgent,
+    fbp:               opts.fbp,
+    fbc:               opts.fbc,
   };
   Object.keys(userData).forEach(k => userData[k] === undefined && delete userData[k]);
 
@@ -44,10 +46,15 @@ async function sendMetaEvent(eventName, opts = {}) {
       body:    JSON.stringify(payload),
     });
     const data = await res.json();
-    if (!res.ok) console.error('[meta] Error:', JSON.stringify(data));
-    else console.log(`[meta] "${eventName}" enviado. Recibidos: ${data.events_received}`);
+    if (!res.ok) {
+      console.error('[meta] Error:', JSON.stringify(data));
+    } else {
+      console.log(`[meta] "${eventName}" enviado OK. Recibidos: ${data.events_received}`);
+    }
+    return data;
   } catch (err) {
-    console.error('[meta] Error:', err.message);
+    console.error('[meta] fetch error:', err.message);
+    return null;
   }
 }
 

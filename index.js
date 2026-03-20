@@ -47,6 +47,22 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, ts: new Date().toISOString() });
 });
 
+app.get('/api/debug-meta', async (req, res) => {
+  const pixelId     = process.env.META_PIXEL_ID;
+  const accessToken = process.env.META_ACCESS_TOKEN;
+  const result = await sendMetaEvent('PageView', {
+    ip:        req.ip,
+    userAgent: req.headers['user-agent'],
+    url:       process.env.FRONTEND_URL,
+    eventId:   `debug_${Date.now()}`,
+  });
+  return res.json({
+    pixel_id_set:     !!pixelId,
+    access_token_set: !!accessToken,
+    meta_response:    result,
+  });
+});
+
 app.use((_req, res) => {
   res.status(404).json({ ok: false, error: 'Not found' });
 });
