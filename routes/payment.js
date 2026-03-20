@@ -68,37 +68,41 @@ router.post('/create', async (req, res) => {
 router.post('/webhook', async (req, res) => {
   const paymentId = req.query.id || req.body?.data?.id;
   const topic     = req.query.topic || req.body?.type;
-  res.sendStatus(200);
 
-  if (topic !== 'payment' && topic !== 'payment_intent') return;
-  if (!paymentId) return;
+  if (topic !== 'payment' && topic !== 'payment_intent' || !paymentId) {
+    return res.sendStatus(200);
+  }
 
   try {
     const payment = await new Payment(mpClient).get({ id: paymentId });
-    if (payment.status !== 'approved') return;
+    if (payment.status !== 'approved') return res.sendStatus(200);
 
     const [sessionId, tier] = (payment.external_reference || '').split('|');
-    if (!sessionId || !tier) return;
+    if (!sessionId || !tier) return res.sendStatus(200);
 
     const updated = await markPaid(sessionId, tier);
     if (updated) {
-      trackEvent('purchase', { tier, amount: TIERS[tier]?.unit_price }).catch(err =>
-        console.error('[trackEvent/purchase]', err.message)
-      );
-      sendMetaEvent('Purchase', {
-        eventId:    `purchase_${paymentId}`,
-        customData: {
-          value:        TIERS[tier]?.unit_price ?? 0,
-          currency:     'ARS',
-          content_name: tier === 'cv' ? 'cv_listo_para_enviar' : 'informe_completo',
-          content_type: 'product',
-          order_id:     String(paymentId),
-        },
-      });
+      await Promise.all([
+        trackEvent('purchase', { tier, amount: TIERS[tier]?.unit_price }).catch(err =>
+          console.error('[trackEvent/purchase]', err.message)
+        ),
+        sendMetaEvent('Purchase', {
+          eventId:    `purchase_${paymentId}`,
+          customData: {
+            value:        TIERS[tier]?.unit_price ?? 0,
+            currency:     'ARS',
+            content_name: tier === 'cv' ? 'cv_listo_para_enviar' : 'informe_completo',
+            content_type: 'product',
+            order_id:     String(paymentId),
+          },
+        }),
+      ]);
     }
   } catch (err) {
     console.error('[payment/webhook]', err.message);
   }
+
+  return res.sendStatus(200);
 });
 
 module.exports = router;

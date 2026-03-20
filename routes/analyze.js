@@ -59,7 +59,7 @@ router.post('/', upload.single('cv'), async (req, res) => {
       keywords_faltantes: Array.isArray(analysis.keywords_faltantes) ? analysis.keywords_faltantes : [],
     };
 
-    sendMetaEvent('Lead', {
+    await sendMetaEvent('Lead', {
       ip:         req.ip,
       userAgent:  req.headers['user-agent'],
       fbp:        req.cookies?.['_fbp'],
