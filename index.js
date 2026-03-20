@@ -2,10 +2,8 @@
 // Rumbo Backend — Entry Point
 // Express server with CORS, JSON body parser, route mounts
 // ============================================================
-if (process.env.NODE_ENV !== 'production') {
-  const { default: dotenv } = await import('dotenv');
-  dotenv.config();
-}
+import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 import cors from 'cors';
 
