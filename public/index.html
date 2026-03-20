@@ -1,0 +1,3582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rumbo — Tu CV contra el Filtro Invisible</title>
+  <meta name="description" content="El 75% de los CVs son descartados por un robot antes de llegar a un humano. Rumbo analiza y optimiza tu CV para pasar los filtros ATS en 24 horas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Meta Pixel — reemplazá TU_PIXEL_ID con el ID real -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'TU_PIXEL_ID');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=TU_PIXEL_ID&ev=PageView&noscript=1"/>
+  </noscript>
+
+  <style>
+    /* =========================================
+       CUSTOM PROPERTIES
+    ========================================= */
+    :root {
+      --navy:        #0A1628;
+      --navy-mid:    #0F1E35;
+      --green:       #00D26A;
+      --orange:      #FF6B35;
+      --gray-ui:     #64748B;
+      --gray-bg:     #F1F5F9;
+      --white:       #FFFFFF;
+
+      --border-dark:  rgba(255, 255, 255, 0.08);
+      --border-light: rgba(10, 22, 40, 0.09);
+
+      --font-ui:      'Inter', system-ui, -apple-system, sans-serif;
+      --font-body:    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      --font-display: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+      /* Non-linear easings — never generic ease */
+      --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-inout:  cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Fluid spacing via clamp */
+      --space-xs:  clamp(0.5rem,  1vw,    0.75rem);
+      --space-sm:  clamp(0.75rem, 1.5vw,  1rem);
+      --space-md:  clamp(1rem,    2vw,    1.5rem);
+      --space-lg:  clamp(1.5rem,  3vw,    2.5rem);
+      --space-xl:  clamp(2.5rem,  5vw,    4rem);
+      --space-2xl: clamp(4rem,    8vw,    7rem);
+
+      --container: min(1100px, 90vw);
+    }
+
+    /* =========================================
+       RESET
+    ========================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--navy);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* Mobile: bump base size + center all buttons */
+    @media (max-width: 640px) {
+      body { font-size: 1.125rem; }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .nav-cta {
+        width: auto;
+        font-size: 0.75rem;
+        padding: 0.4rem 0.9rem;
+      }
+
+      .hero-actions {
+        align-items: stretch;
+      }
+
+      .solucion-cta,
+      .cta-final-actions {
+        align-items: stretch;
+      }
+    }
+
+    img, svg { display: block; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+    ul { list-style: none; }
+
+    /* Global display type — system-ui weight 900 on all headings */
+    h1, h2 {
+      font-family: var(--font-display);
+      font-weight: 900;
+    }
+
+    /* =========================================
+       NAV
+    ========================================= */
+    .nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem var(--space-lg);
+      background: rgba(10, 22, 40, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-dark);
+      transition: border-color 300ms var(--ease-inout);
+    }
+
+    .nav-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.03em;
+    }
+    .nav-logo em {
+      color: var(--green);
+      font-style: normal;
+    }
+
+    /* Nav CTA inherits all .btn magic — only overrides sizing */
+    .nav-cta {
+      font-size: 0.8125rem;
+      padding: 0.5rem 1.25rem;
+    }
+
+    /* =========================================
+       HERO
+    ========================================= */
+    .hero {
+      background: var(--navy);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: calc(var(--space-2xl) + 5rem) var(--space-lg) var(--space-2xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle grid texture — engineering aesthetic */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 210, 106, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 210, 106, 0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+    }
+
+    /* Radial accent glow — top right, directional */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -15%;
+      right: -8%;
+      width: 55%;
+      height: 65%;
+      background: radial-gradient(ellipse at 60% 30%, rgba(0, 210, 106, 0.07) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.625rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: var(--space-md);
+    }
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.75rem, 6.5vw, 4.75rem);
+      color: var(--white);
+      line-height: 1.06;
+      letter-spacing: -0.025em;
+      max-width: 14ch;
+      margin-bottom: var(--space-md);
+    }
+
+    .hero-sub {
+
+      font-size: clamp(1rem, 2vw, 1.1875rem);
+      color: rgba(255, 255, 255, 0.58);
+      max-width: 54ch;
+      line-height: 1.68;
+      margin-bottom: var(--space-xl);
+    }
+    .hero-sub strong {
+      color: rgba(255, 255, 255, 0.88);
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-sm);
+    }
+
+    /* =========================================
+       BUTTON: PRIMARY (used in max 2 focal points)
+    ========================================= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--navy);
+      padding: 0.9rem 2rem;
+      border-radius: 8px;
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+
+      /* Layered background: base green + subtle radial center-glow */
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.18) 0%, transparent 70%),
+        linear-gradient(180deg, #00E074 0%, #00C060 100%);
+
+      /* Multi-layer shadow system: ambient + directional + glow */
+      box-shadow:
+        0 0 0 1px rgba(0, 210, 106, 0.5),          /* border ring */
+        inset 0 1px 0 rgba(255,255,255,0.28),       /* top inner highlight */
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1),          /* bottom inner shadow */
+        0 1px 2px rgba(0, 0, 0, 0.12),              /* tight drop */
+        0 4px 12px rgba(0, 210, 106, 0.28),         /* green halo */
+        0 12px 32px rgba(0, 210, 106, 0.15);        /* wide ambient glow */
+
+      transition:
+        transform 220ms var(--ease-out),
+        box-shadow 220ms var(--ease-out);
+    }
+
+    /* Shine sweep — pseudo element that slides across on hover */
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.22) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%);
+      transition: transform 480ms var(--ease-out);
+      pointer-events: none;
+    }
+    .btn:hover::before {
+      transform: translateX(100%);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 0 1px rgba(0, 210, 106, 0.65),
+        inset 0 1px 0 rgba(255,255,255,0.32),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.14),
+        0 6px 20px rgba(0, 210, 106, 0.38),
+        0 20px 48px rgba(0, 210, 106, 0.2);
+    }
+    .btn:active {
+      transform: translateY(0px);
+      box-shadow:
+        0 0 0 1px rgba(0, 210, 106, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 2px 6px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 210, 106, 0.2);
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.1) 0%, transparent 70%),
+        linear-gradient(180deg, #00C060 0%, #00B058 100%);
+      transition-duration: 80ms;
+    }
+
+    .btn--full {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .social-proof {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      color: rgba(255, 255, 255, 0.38);
+      font-weight: 400;
+    }
+    .proof-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+      animation: breath 2.2s ease-in-out infinite;
+    }
+    @keyframes breath {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
+
+    /* =========================================
+       SECTION SHELL
+    ========================================= */
+    section {
+      padding: var(--space-2xl) var(--space-lg);
+    }
+
+    .inner {
+      max-width: var(--container);
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: var(--space-sm);
+    }
+    .section-label--muted { color: rgba(255, 255, 255, 0.3); }
+
+    /* =========================================
+       SECTION 2: PROBLEMA
+    ========================================= */
+    .problema { background: var(--gray-bg); }
+
+    .problema h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      margin-bottom: var(--space-xl);
+      max-width: 18ch;
+    }
+
+    .problema-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    .copy-block {
+
+      font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+      line-height: 1.78;
+      color: #2D3748;
+    }
+    .copy-block p + p { margin-top: 1em; }
+    .copy-block strong {
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    /* Stat card — sticky on scroll for visual anchoring */
+    .stat-card {
+      background: var(--navy);
+      border-radius: 14px;
+      padding: var(--space-lg);
+      position: sticky;
+      top: calc(var(--space-lg) + 5rem);
+    }
+
+    .stat-number {
+      display: block;
+      font-size: clamp(4.5rem, 9vw, 7rem);
+      font-weight: 700;
+      color: var(--green);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .stat-text {
+      font-size: clamp(0.875rem, 1.5vw, 1rem);
+      color: rgba(255, 255, 255, 0.62);
+      margin-top: 0.625rem;
+      line-height: 1.55;
+
+    }
+
+    .stat-rule {
+      width: 36px;
+      height: 2px;
+      background: var(--green);
+      opacity: 0.35;
+      margin: var(--space-md) 0;
+    }
+
+    .stat-footnote {
+      font-size: 0.8125rem;
+      color: rgba(255, 255, 255, 0.3);
+      line-height: 1.5;
+    }
+
+    /* =========================================
+       SECTION 3: ENEMIGO
+    ========================================= */
+    .enemigo {
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .enemigo h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      color: var(--white);
+      margin-bottom: var(--space-xl);
+      max-width: 22ch;
+    }
+
+    .enemigo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    .copy-block--dark {
+
+      font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+      line-height: 1.78;
+      color: rgba(255, 255, 255, 0.62);
+    }
+    .copy-block--dark p + p { margin-top: 1em; }
+    .copy-block--dark strong { color: var(--white); font-weight: 600; }
+
+    /* ATS filter visualization card */
+    .ats-card {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: var(--space-lg);
+    }
+
+    .ats-card-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: var(--space-md);
+    }
+
+    .ats-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .ats-item {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 0.875rem;
+      align-items: start;
+      padding: 0.875rem;
+      background: rgba(255, 107, 53, 0.055);
+      border: 1px solid rgba(255, 107, 53, 0.11);
+      border-radius: 8px;
+    }
+
+    .ats-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 107, 53, 0.12);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .ats-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--orange);
+      stroke-width: 2;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    .ats-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.2rem;
+    }
+    .ats-desc {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.45;
+
+    }
+
+    .ats-result {
+      margin-top: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(255, 107, 53, 0.07);
+      border: 1px solid rgba(255, 107, 53, 0.18);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.55;
+
+    }
+    .ats-result strong { color: var(--orange); font-weight: 600; }
+
+    /* =========================================
+       SECTION 4: SOLUCIÓN
+    ========================================= */
+    .solucion { background: var(--white); }
+
+    .solucion h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      margin-bottom: var(--space-sm);
+    }
+
+    .solucion-sub {
+
+      font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+      color: var(--gray-ui);
+      max-width: 52ch;
+      line-height: 1.65;
+      margin-bottom: var(--space-xl);
+    }
+
+    .solucion-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+      margin-bottom: var(--space-lg);
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 0.875rem;
+      align-items: start;
+    }
+
+    .check-circle {
+      width: 22px;
+      height: 22px;
+      background: rgba(0, 210, 106, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .check-circle svg {
+      width: 11px;
+      height: 11px;
+      stroke: var(--green);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .feature-text {
+
+      font-size: clamp(0.9375rem, 1.5vw, 1rem);
+      color: var(--navy);
+      line-height: 1.5;
+    }
+
+    /* =========================================
+       SECTION 5: PROCESO
+    ========================================= */
+    .proceso { background: var(--gray-bg); }
+
+    .proceso h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-xl);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      position: relative;
+    }
+
+    /* Connector line between step numbers */
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 27px;
+      left: calc(16.5% + 16px);
+      right: calc(16.5% + 16px);
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0,210,106,0.5) 0%, rgba(0,210,106,0.1) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .step {
+      background: var(--white);
+      border-radius: 14px;
+      padding: var(--space-lg);
+      border: 1px solid var(--border-light);
+      position: relative;
+    }
+
+    .step-num {
+      width: 54px;
+      height: 54px;
+      background: var(--navy);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--green);
+      margin-bottom: var(--space-md);
+      position: relative;
+      z-index: 1;
+    }
+
+    .step h3 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+    }
+
+    .step p {
+
+      font-size: 0.9375rem;
+      color: var(--gray-ui);
+      line-height: 1.62;
+    }
+
+    .step-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 0.02em;
+    }
+
+    /* =========================================
+       SECTION 6: OFERTA
+    ========================================= */
+    .oferta { background: var(--white); }
+
+    .oferta h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      margin-bottom: var(--space-xl);
+    }
+    .oferta h2 .price { color: var(--green); }
+
+    .oferta-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      align-items: start;
+    }
+
+    /* Main offer card on dark background */
+    .offer-card {
+      background: var(--navy);
+      border-radius: 16px;
+      padding: var(--space-lg);
+      color: var(--white);
+    }
+
+    .offer-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1.375rem;
+    }
+
+    .offer-item {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 0.875rem;
+      align-items: start;
+    }
+
+    .offer-check {
+      width: 20px;
+      height: 20px;
+      background: rgba(0, 210, 106, 0.14);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .offer-check svg {
+      width: 10px;
+      height: 10px;
+      stroke: var(--green);
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .offer-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.25rem;
+    }
+    .offer-desc {
+      font-size: 0.8125rem;
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1.5;
+
+    }
+
+    /* Upsell — interactive checkbox */
+    .upsell-card {
+      border: 1.5px solid var(--border-light);
+      border-radius: 16px;
+      padding: var(--space-lg);
+      background: var(--gray-bg);
+      cursor: pointer;
+      transition: border-color 250ms var(--ease-out), background 250ms var(--ease-out);
+    }
+    .upsell-card.active {
+      border-color: var(--green);
+      background: rgba(0, 210, 106, 0.04);
+    }
+
+    .upsell-header {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 0.875rem;
+      align-items: start;
+      margin-bottom: var(--space-md);
+    }
+
+    .upsell-box {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--gray-ui);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: border-color 200ms var(--ease-out), background 200ms var(--ease-out);
+    }
+    .upsell-card.active .upsell-box {
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .upsell-box svg {
+      width: 11px;
+      height: 11px;
+      stroke: var(--navy);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+    }
+    .upsell-card.active .upsell-box svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .upsell-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.01em;
+    }
+    .upsell-price {
+      font-size: 0.875rem;
+      color: var(--gray-ui);
+      margin-top: 0.25rem;
+    }
+
+    .upsell-divider {
+      height: 1px;
+      background: var(--border-light);
+      margin-bottom: var(--space-md);
+    }
+
+    .upsell-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+    .upsell-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.625rem;
+      font-size: 0.875rem;
+      color: var(--gray-ui);
+
+      line-height: 1.45;
+    }
+    .upsell-item::before {
+      content: '—';
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* =========================================
+       SECTION 7: TESTIMONIOS
+    ========================================= */
+    .testimonios { background: var(--gray-bg); }
+
+    .testimonios h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      max-width: 22ch;
+      margin-bottom: var(--space-xl);
+    }
+
+    .testimonios-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+    }
+
+    .card-t {
+      background: var(--white);
+      border-radius: 14px;
+      padding: var(--space-lg);
+      border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .card-t-stars {
+      color: var(--green);
+      font-size: 0.875rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-t-body {
+      font-size: 0.9375rem;
+      line-height: 1.72;
+      color: #2D3748;
+      flex: 1;
+    }
+
+    .card-t-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      overflow: hidden;
+      background: var(--navy);
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .author-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .author-detail {
+      font-size: 0.75rem;
+      color: var(--gray-ui);
+      margin-top: 0.125rem;
+    }
+
+    /* =========================================
+       SECTION 8: URGENCIA
+    ========================================= */
+    .urgencia {
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .urgencia h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: var(--space-md);
+    }
+
+    .urgencia-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    .urgencia-consequence {
+      margin-top: var(--space-lg);
+      padding: var(--space-md);
+      background: rgba(255, 107, 53, 0.07);
+      border: 1px solid rgba(255, 107, 53, 0.15);
+      border-radius: 10px;
+
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.65;
+    }
+
+    /* Cupos card */
+    .cupos-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: var(--space-lg);
+    }
+
+    .cupos-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: var(--space-md);
+    }
+
+    .ping-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--orange);
+      flex-shrink: 0;
+      animation: ping 2.2s ease-in-out infinite;
+    }
+    @keyframes ping {
+      0%   { box-shadow: 0 0 0 0   rgba(255, 107, 53, 0.45); }
+      70%  { box-shadow: 0 0 0 9px rgba(255, 107, 53, 0);    }
+      100% { box-shadow: 0 0 0 0   rgba(255, 107, 53, 0);    }
+    }
+
+    .badge-text {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--orange);
+    }
+
+    .progress-wrap { margin-bottom: var(--space-md); }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.32);
+      margin-bottom: 0.5rem;
+    }
+    .progress-track {
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 54%; /* 27/50 tomados */
+      background: var(--orange);
+      border-radius: 999px;
+    }
+
+    .cupos-note {
+      font-size: 0.8125rem;
+      color: rgba(255, 255, 255, 0.35);
+      line-height: 1.55;
+
+      margin-bottom: var(--space-md);
+    }
+
+    /* =========================================
+       SECTION 9: CTA FINAL
+    ========================================= */
+    .cta-final {
+      background: var(--navy);
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .cta-final-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .cta-final h2 {
+      font-size: clamp(2.25rem, 5.5vw, 3.75rem);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      margin-bottom: var(--space-md);
+    }
+
+    .cta-final-sub {
+
+      font-size: clamp(0.9375rem, 1.75vw, 1.125rem);
+      color: rgba(255, 255, 255, 0.45);
+      margin-bottom: var(--space-lg);
+      line-height: 1.6;
+    }
+
+    .cta-final-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .cta-final-note {
+      font-size: 0.8125rem;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* =========================================
+       SECTION 10: FAQ
+    ========================================= */
+    .faq { background: var(--white); }
+
+    .faq .inner { text-align: center; }
+
+    .faq h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-xl);
+    }
+
+    .faq-list {
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .faq-q {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 0;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      transition: color 180ms var(--ease-out);
+    }
+    .faq-q:hover { color: var(--green); }
+
+    .faq-toggle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 300ms var(--ease-out);
+    }
+    .faq-toggle svg {
+      width: 10px;
+      height: 10px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      fill: none;
+      transition: transform 300ms var(--ease-out);
+    }
+
+    .faq-item.open .faq-q { color: var(--green); }
+    .faq-item.open .faq-toggle svg { transform: rotate(180deg); }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 380ms var(--ease-out);
+    }
+    .faq-item.open .faq-a { max-height: 600px; }
+
+    .faq-a-inner {
+      padding-bottom: 1.25rem;
+
+      font-size: 0.9375rem;
+      color: var(--gray-ui);
+      line-height: 1.68;
+      text-align: left; /* respuesta alineada izq dentro del contenedor centrado */
+    }
+
+    /* =========================================
+       FOOTER
+    ========================================= */
+    footer {
+      background: var(--navy);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    .footer-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .footer-logo {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .footer-logo em {
+      color: var(--green);
+      font-style: normal;
+    }
+    .footer-tagline {
+      font-size: 0.8125rem;
+      color: rgba(255, 255, 255, 0.25);
+      margin-top: 0.25rem;
+    }
+
+    .footer-right { text-align: right; }
+    .footer-mail {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.45);
+      transition: color 180ms var(--ease-out);
+    }
+    .footer-mail:hover { color: var(--green); }
+    .footer-loc {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.2);
+      margin-top: 0.25rem;
+    }
+
+    /* =========================================
+       MOCKUP CARD (hero right column)
+    ========================================= */
+    .mockup {
+      background: #FFFFFF;
+      border: 1px solid rgba(10, 22, 40, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(10,22,40,0.06),
+        0 4px 16px rgba(10,22,40,0.08),
+        0 24px 64px rgba(10,22,40,0.14);
+      transform: perspective(1200px) rotateY(-4deg) rotateX(2deg);
+      transition: transform 600ms var(--ease-out);
+    }
+    .mockup:hover {
+      transform: perspective(1200px) rotateY(-1deg) rotateX(0.5deg);
+    }
+
+    .mockup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.875rem 1.25rem;
+      border-bottom: 1px solid rgba(10, 22, 40, 0.07);
+      background: var(--gray-bg);
+    }
+
+    /* macOS-style window dots */
+    .mockup-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .mockup-dot:nth-child(1) { background: #FF5F56; }
+    .mockup-dot:nth-child(2) { background: #FFBD2E; }
+    .mockup-dot:nth-child(3) { background: #27C93F; }
+
+    .mockup-title {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: rgba(10, 22, 40, 0.4);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .mockup-header { position: relative; }
+
+    .mockup-live {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 0.03em;
+    }
+    .mockup-live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: breath 2s ease-in-out infinite;
+    }
+
+    .mockup-body { padding: 1.5rem 1.25rem 1.25rem; }
+
+    .mockup-score-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .mockup-score-num {
+      font-size: clamp(3rem, 5vw, 4.5rem);
+      font-weight: 700;
+      color: #FF4F4F;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      min-width: 3ch;
+    }
+
+    .mockup-score-meta { padding-bottom: 0.375rem; }
+    .mockup-score-of {
+      font-size: 1rem;
+      color: rgba(10,22,40,0.3);
+    }
+    .mockup-score-status {
+      display: inline-block;
+      margin-top: 0.375rem;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #FF4F4F;
+      background: rgba(255, 79, 79, 0.12);
+      border: 1px solid rgba(255, 79, 79, 0.2);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .mockup-progress {
+      margin-bottom: 1.25rem;
+    }
+    .mockup-progress-track {
+      height: 4px;
+      background: rgba(10,22,40,0.07);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .mockup-progress-fill {
+      height: 100%;
+      width: 0%; /* animated by JS */
+      background: linear-gradient(90deg, #FF4F4F 0%, #FF6B35 100%);
+      border-radius: 999px;
+      transition: width 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mockup-section-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(10,22,40,0.35);
+      margin-bottom: 0.625rem;
+    }
+
+    .mockup-errors {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.125rem;
+    }
+
+    .mockup-error {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255, 79, 79, 0.05);
+      border: 1px solid rgba(255, 79, 79, 0.14);
+      border-radius: 6px;
+      font-size: 0.8125rem;
+      color: rgba(10,22,40,0.65);
+      gap: 0.5rem;
+    }
+    .mockup-error-text { flex: 1; }
+    .mockup-error-badge {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--orange);
+      background: rgba(255, 107, 53, 0.14);
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Blurred "unlock" CTA — creates desire */
+    .mockup-blur-wrap {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .mockup-blur-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.75rem;
+      background: rgba(0, 210, 106, 0.1);
+      border: 1px solid rgba(0, 210, 106, 0.18);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--green);
+      filter: blur(4px);
+      user-select: none;
+      pointer-events: none;
+    }
+    .mockup-blur-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(10,22,40,0.6);
+      letter-spacing: 0.04em;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      cursor: pointer;
+      transition: background 200ms var(--ease-out);
+    }
+    .mockup-blur-overlay:hover { background: rgba(255,255,255,0.65); }
+    .mockup-blur-overlay svg {
+      width: 12px;
+      height: 12px;
+      stroke: rgba(10,22,40,0.5);
+      stroke-width: 2;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    /* =========================================
+       UPLOAD ZONE (mid-page section)
+    ========================================= */
+    .upload-section { background: var(--white); }
+
+    .upload-section h2 {
+      font-size: clamp(1.875rem, 4.5vw, 3.25rem);
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      margin-bottom: var(--space-sm);
+    }
+
+    .upload-sub {
+
+      font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+      color: var(--gray-ui);
+      margin-bottom: var(--space-xl);
+      line-height: 1.6;
+    }
+
+    .dropzone {
+      border: 1.5px dashed rgba(10, 22, 40, 0.18);
+      border-radius: 16px;
+      padding: clamp(2.5rem, 5vw, 4rem) var(--space-lg);
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition:
+        border-color 220ms var(--ease-out),
+        background 220ms var(--ease-out);
+      background: var(--gray-bg);
+    }
+    .dropzone:hover,
+    .dropzone.dragover {
+      border-color: var(--green);
+      background: rgba(0, 210, 106, 0.04);
+    }
+    .dropzone.analyzing { cursor: default; pointer-events: none; }
+    .dropzone.asking    { cursor: default; }
+
+    .dz-default  { transition: opacity 300ms var(--ease-out); }
+    .dz-loading  { display: none; }
+    .dz-result   { display: none; }
+    .dz-asking   { display: none; }
+
+    /* asking state — hide default, show asking card */
+    .dropzone.asking .dz-default  { display: none; }
+    .dropzone.asking .dz-asking   { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+
+    /* asking card styles */
+    .dz-asking-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: center;
+    }
+    .dz-asking-sub {
+      font-size: 0.85rem;
+      color: var(--gray-ui);
+      text-align: center;
+      margin-top: -8px;
+    }
+    .dz-asking-input {
+      width: 100%;
+      max-width: 360px;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border-light);
+      border-radius: 10px;
+      font-size: 0.9375rem;
+      font-family: inherit;
+      color: var(--text-primary);
+      background: #fff;
+      outline: none;
+      transition: border-color 180ms;
+    }
+    .dz-asking-input:focus { border-color: var(--green); }
+    .dz-asking-input::placeholder { color: rgba(10,22,40,.35); }
+    .dz-asking-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 360px;
+    }
+    .dz-asking-btn-primary {
+      padding: 13px 20px;
+      background: var(--green);
+      color: var(--navy);
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: opacity 150ms;
+    }
+    .dz-asking-btn-primary:hover { opacity: .88; }
+    .dz-asking-btn-secondary {
+      padding: 11px 20px;
+      background: transparent;
+      color: var(--text-primary);
+      border: 1.5px solid rgba(10,22,40,0.25);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color 150ms, background 150ms;
+    }
+    .dz-asking-btn-secondary:hover { border-color: var(--green); background: rgba(0,210,106,0.05); }
+
+    .dropzone.analyzing .dz-default { display: none; }
+    .dropzone.analyzing .dz-loading { display: block; }
+    .dropzone.done      .dz-default { display: none; }
+    .dropzone.done      .dz-loading { display: none; }
+    .dropzone.done      .dz-result  { display: block; }
+
+    .dz-icon {
+      width: 56px;
+      height: 56px;
+      background: rgba(10,22,40,0.06);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-md);
+      transition: background 220ms var(--ease-out), transform 220ms var(--ease-out);
+    }
+    .dropzone:hover .dz-icon,
+    .dropzone.dragover .dz-icon {
+      background: rgba(0, 210, 106, 0.1);
+      transform: translateY(-2px);
+    }
+    .dz-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--gray-ui);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      fill: none;
+      transition: stroke 220ms var(--ease-out);
+    }
+    .dropzone:hover .dz-icon svg,
+    .dropzone.dragover .dz-icon svg { stroke: var(--green); }
+
+    .dz-headline {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 0.375rem;
+    }
+    .dz-sub {
+      font-size: 0.875rem;
+      color: var(--gray-ui);
+
+      margin-bottom: var(--space-md);
+    }
+
+    .dz-formats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .dz-format {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--gray-ui);
+      background: rgba(10,22,40,0.06);
+      border: 1px solid rgba(10,22,40,0.08);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .dz-format-sep {
+      font-size: 0.75rem;
+      color: rgba(10,22,40,0.2);
+    }
+
+    /* Hidden file input */
+    .dz-input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .dropzone.asking .dz-input { display: none; }
+
+    /* Analyzing state */
+    .dz-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(0,210,106,0.15);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 700ms linear infinite;
+      margin: 0 auto var(--space-md);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .dz-loading-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 0.375rem;
+      transition: opacity 280ms ease;
+    }
+    .dz-loading-sub {
+      font-size: 0.875rem;
+      color: var(--gray-ui);
+    }
+
+    /* Result state — freemium gate */
+    .dropzone.done {
+      border-style: solid;
+      border-color: rgba(0, 210, 106, 0.25);
+      background: var(--white);
+      cursor: default;
+      text-align: left;
+      padding: var(--space-lg);
+      pointer-events: none;
+    }
+    .dropzone.done .btn { pointer-events: auto; cursor: pointer; }
+    .dropzone.done .dz-input { display: none; }
+
+    .dz-result-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .dz-result-score-block { flex-shrink: 0; }
+    .dz-result-score {
+      font-size: clamp(3rem, 6vw, 4rem);
+      font-weight: 900;
+      color: #FF4F4F;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      font-family: var(--font-display);
+    }
+    .dz-result-score-sub {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #FF4F4F;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.25rem;
+    }
+    .dz-result-meta { flex: 1; }
+    .dz-result-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.25rem;
+    }
+    .dz-result-desc {
+      font-size: 0.875rem;
+      color: var(--gray-ui);
+      line-height: 1.5;
+    }
+
+    /* Visible error */
+    .dz-errors-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      margin-bottom: var(--space-md);
+    }
+    .dz-err {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      border-radius: 7px;
+      font-size: 0.875rem;
+      gap: 0.5rem;
+    }
+    .dz-err--visible {
+      background: rgba(255, 79, 79, 0.06);
+      border: 1px solid rgba(255, 79, 79, 0.14);
+      color: rgba(10,22,40,0.75);
+    }
+    .dz-err-badge {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--orange);
+      background: rgba(255,107,53,0.12);
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Locked errors — blur + overlay */
+    .dz-errors-locked {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+    .dz-err--locked {
+      background: rgba(10,22,40,0.03);
+      border: 1px solid rgba(10,22,40,0.06);
+      user-select: none;
+      pointer-events: none;
+      filter: blur(4px);
+      opacity: .7;
+    }
+
+    .dz-lock-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--navy);
+      background: rgba(241, 245, 249, 0.88);
+      backdrop-filter: blur(3px);
+      border-radius: 7px;
+    }
+    .dz-lock-overlay svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--navy);
+      stroke-width: 2;
+      stroke-linecap: round;
+      fill: none;
+      flex-shrink: 0;
+    }
+
+    /* Paywall CTA block */
+    .dz-paywall {
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--border-light);
+    }
+    .dz-paywall-note {
+      font-size: 0.8125rem;
+      color: var(--gray-ui);
+      margin-top: 0.625rem;
+      text-align: center;
+    }
+    .dz-paywall-note strong { color: var(--navy); }
+
+    /* =========================================
+       STICKY BAR
+    ========================================= */
+    .sticky-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 98;
+      padding: 0.875rem var(--space-lg);
+      background: rgba(10, 22, 40, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      transform: translateY(110%);
+      transition: transform 420ms var(--ease-out);
+    }
+    .sticky-bar.visible { transform: translateY(0); }
+    .sticky-bar.dismissed { display: none; }
+
+    .sticky-bar-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .sticky-bar-copy { flex: 1; }
+    .sticky-bar-headline {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.01em;
+      text-align: center;
+    }
+
+    .sticky-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      flex-shrink: 0;
+    }
+
+    /* Smaller button variant for sticky bar */
+    .btn--sm {
+      font-size: 0.875rem;
+      padding: 0.625rem 1.375rem;
+    }
+
+    .sticky-close {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: rgba(255,255,255,0.35);
+      transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out);
+    }
+    .sticky-close:hover {
+      color: var(--white);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .sticky-close svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    @media (max-width: 600px) {
+      .sticky-bar-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+      }
+      .sticky-bar-right { width: 100%; }
+      .btn--sm { width: 100%; justify-content: center; }
+    }
+
+    /* =========================================
+       SCROLL REVEAL
+    ========================================= */
+    .r {
+      opacity: 0;
+      transform: translateY(22px);
+      transition:
+        opacity  550ms var(--ease-out),
+        transform 550ms var(--ease-out);
+    }
+    .r.in { opacity: 1; transform: none; }
+    .r.d1 { transition-delay: 80ms;  }
+    .r.d2 { transition-delay: 160ms; }
+    .r.d3 { transition-delay: 240ms; }
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+    @media (max-width: 860px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+      /* Show mockup on mobile — no tilt, full width */
+      .mockup {
+        transform: none;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      .mockup:hover { transform: none; }
+
+      .problema-body,
+      .enemigo-grid,
+      .solucion-grid,
+      .urgencia-layout,
+      .oferta-layout,
+      .testimonios-grid { grid-template-columns: 1fr; }
+
+      .stat-card { position: static; }
+
+      .steps {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+      }
+      .steps::before { display: none; }
+    }
+
+    /* =========================================
+       MODAL — Result overlay
+    ========================================= */
+
+    /* Overlay — hidden by default, fades in on .open */
+    #modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(10, 22, 40, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 320ms var(--ease-out);
+    }
+    #modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Modal card */
+    .modal-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: var(--space-lg);
+      max-width: 520px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow:
+        0 0 0 1px rgba(10,22,40,0.06),
+        0 8px 32px rgba(10,22,40,0.18),
+        0 32px 80px rgba(10,22,40,0.14);
+      /* Prevent the card click from bubbling to overlay */
+      scroll-behavior: smooth;
+    }
+
+    /* Close button — top right */
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-ui);
+      transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out), background 180ms var(--ease-out);
+      flex-shrink: 0;
+    }
+    .modal-close:hover {
+      color: var(--navy);
+      border-color: rgba(10,22,40,0.2);
+      background: var(--gray-bg);
+    }
+    .modal-close svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    /* Score display */
+    .modal-score-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.375rem;
+      flex-wrap: wrap;
+    }
+    .modal-score-num {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 10vw, 5.5rem);
+      font-weight: 900;
+      color: #FF4F4F;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+    .modal-score-of {
+      font-size: 1.25rem;
+      color: rgba(10,22,40,0.3);
+      font-weight: 400;
+      align-self: flex-end;
+      padding-bottom: 0.2rem;
+    }
+    .modal-score-nivel {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #FF4F4F;
+      background: rgba(255, 79, 79, 0.12);
+      border: 1px solid rgba(255, 79, 79, 0.22);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      align-self: flex-end;
+      margin-bottom: 0.3rem;
+    }
+    .modal-score-context {
+      font-size: 0.875rem;
+      color: rgba(10,22,40,0.45);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Problems list */
+    .modal-problems {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .modal-problem-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.625rem;
+      padding: 0.625rem 0.75rem;
+      background: rgba(255,79,79,0.04);
+      border: 1px solid rgba(255,79,79,0.12);
+      border-radius: 8px;
+    }
+    .modal-problem-icon {
+      font-size: 0.875rem;
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+    .modal-problem-text {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: rgba(10,22,40,0.8);
+      line-height: 1.4;
+    }
+    .modal-problem-more {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--navy);
+      background: rgba(10,22,40,0.04);
+      border: 1px solid rgba(10,22,40,0.08);
+      border-radius: 8px;
+      padding: 0.625rem 0.875rem;
+      margin-bottom: 1rem;
+    }
+    .modal-problem-more svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--navy);
+      stroke-width: 2;
+      stroke-linecap: round;
+      fill: none;
+      flex-shrink: 0;
+    }
+    .modal-pain-line {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: rgba(10,22,40,0.6);
+      line-height: 1.5;
+      margin-top: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    /* Pricing header */
+    .modal-pricing-header {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.4;
+      margin-bottom: 0.875rem;
+    }
+
+    /* Countdown timer */
+    .modal-timer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      color: rgba(10,22,40,0.5);
+      background: rgba(10,22,40,0.03);
+      border: 1px solid rgba(10,22,40,0.07);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      margin-bottom: 0.875rem;
+    }
+    .modal-timer-count {
+      font-weight: 700;
+      color: var(--navy);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+    }
+
+    /* Pricing tiers grid */
+    .modal-tiers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 500px) {
+      .modal-tiers { grid-template-columns: 1fr; }
+    }
+
+    .modal-tier {
+      border: 1.5px solid var(--border-light);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: relative;
+    }
+    .modal-tier--featured {
+      border-color: var(--green);
+      background: rgba(0, 210, 106, 0.02);
+    }
+    .modal-tier-badge {
+      position: absolute;
+      top: -0.6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--green);
+      padding: 0.15rem 0.65rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .modal-tier-name {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .modal-tier-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .modal-tier-price {
+      font-size: 1.375rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+    }
+    .modal-tier-price-anchor {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: rgba(10,22,40,0.35);
+      text-decoration: line-through;
+    }
+    .modal-tier-discount {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--green);
+      background: rgba(0,210,106,0.12);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+    .modal-tier-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      flex: 1;
+      margin-bottom: 0.25rem;
+    }
+    .modal-tier-features li {
+      font-size: 0.75rem;
+      color: rgba(10,22,40,0.7);
+      line-height: 1.4;
+    }
+    .modal-tier-features li.feat-no { color: rgba(10,22,40,0.35); }
+    .modal-tier-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+    }
+    .modal-tier-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .modal-tier-btn:active { transform: translateY(0); opacity: 1; }
+    .modal-tier-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .modal-tier-btn--primary {
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.18) 0%, transparent 70%),
+        linear-gradient(180deg, #00E074 0%, #00C060 100%);
+      color: var(--navy);
+      box-shadow: 0 0 0 1px rgba(0,210,106,0.4), 0 4px 12px rgba(0,210,106,0.28);
+    }
+    .modal-tier-btn--secondary {
+      background: rgba(10,22,40,0.07);
+      color: var(--navy);
+    }
+    .modal-tier-note {
+      font-size: 0.6875rem;
+      color: rgba(10,22,40,0.35);
+      text-align: center;
+    }
+
+    /* Social proof */
+    .modal-social-proof {
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: rgba(10,22,40,0.5);
+      margin-bottom: 0.875rem;
+    }
+
+    /* Human face */
+    .modal-human {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      padding: 0.875rem;
+      background: rgba(10,22,40,0.02);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      margin-bottom: 0.875rem;
+    }
+    .modal-human-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(0,210,106,0.12);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+    .modal-human-name {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.25rem;
+    }
+    .modal-human-bio {
+      font-size: 0.75rem;
+      color: rgba(10,22,40,0.55);
+      line-height: 1.5;
+    }
+
+    /* Cost of inaction */
+    .modal-cost-line {
+      font-size: 0.8125rem;
+      color: rgba(10,22,40,0.4);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* Error message inside dropzone */
+    .dz-error-msg {
+      display: none;
+      margin-top: 0.875rem;
+      font-size: 0.875rem;
+      color: #FF4F4F;
+      font-weight: 500;
+    }
+    .dz-error-msg.visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAV ===================== -->
+  <nav class="nav" id="nav">
+    <div class="nav-logo">RUMBO<em> |</em></div>
+    <a href="#upload-zone" class="btn nav-cta">Analizá tu CV ahora</a>
+  </nav>
+
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="hero-inner">
+
+      <!-- Left: copy + CTA -->
+      <div class="hero-left">
+        <div class="eyebrow">Optimización ATS para tu próxima entrevista</div>
+        <h1>¿Mandás CVs y nadie te llama?</h1>
+        <p class="hero-sub">
+          No sos vos. Es el <strong>Filtro Invisible</strong>: un robot que descarta
+          tu CV antes de que un humano lo vea.
+          <strong>El 75% de los CVs nunca llegan a una persona real.</strong>
+        </p>
+        <div class="hero-actions" id="hero-cta">
+          <a href="#upload-zone" class="btn">
+            Analizá tu CV ahora
+          </a>
+          <div class="social-proof" style="justify-content:center;">
+            <span class="proof-dot"></span>
+            1.247 CVs analizados
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: ATS score mockup -->
+      <div class="hero-right">
+        <div class="mockup" id="ats-mockup">
+          <div class="mockup-header">
+            <div class="mockup-dots">
+              <span class="mockup-dot"></span>
+              <span class="mockup-dot"></span>
+              <span class="mockup-dot"></span>
+            </div>
+            <span class="mockup-title">Diagnóstico ATS</span>
+            <div class="mockup-live">
+              <span class="mockup-live-dot"></span>
+              En vivo
+            </div>
+          </div>
+
+          <div class="mockup-body">
+            <!-- Score -->
+            <div class="mockup-score-row">
+              <div class="mockup-score-num" id="score-num">0</div>
+              <div class="mockup-score-meta">
+                <div class="mockup-score-of">/100</div>
+                <div class="mockup-score-status">Muy bajo</div>
+              </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="mockup-progress">
+              <div class="mockup-progress-track">
+                <div class="mockup-progress-fill" id="score-bar"></div>
+              </div>
+            </div>
+
+            <!-- Errors -->
+            <div class="mockup-section-label">12 errores críticos detectados</div>
+            <ul class="mockup-errors">
+              <li class="mockup-error">
+                <span class="mockup-error-text">Palabras clave faltantes</span>
+                <span class="mockup-error-badge">×8</span>
+              </li>
+              <li class="mockup-error">
+                <span class="mockup-error-text">Formato incompatible (tablas)</span>
+                <span class="mockup-error-badge">×3</span>
+              </li>
+              <li class="mockup-error">
+                <span class="mockup-error-text">Sin sección de habilidades</span>
+                <span class="mockup-error-badge">×1</span>
+              </li>
+            </ul>
+
+            <!-- Blurred CTA — creates desire to see own result -->
+            <div class="mockup-blur-wrap" onclick="document.getElementById('upload-zone').scrollIntoView({behavior:'smooth'})">
+              <div class="mockup-blur-btn">Ver diagnóstico completo →</div>
+              <div class="mockup-blur-overlay">
+                <svg viewBox="0 0 16 16"><path d="M8 1v8M4 5l4-4 4 4"/><path d="M2 13h12"/></svg>
+                Subí tu CV para ver el tuyo
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ===================== PROBLEMA ===================== -->
+  <section class="problema">
+    <div class="inner">
+      <span class="section-label">El problema</span>
+      <h2>El agujero negro de los CVs</h2>
+
+      <div class="problema-body">
+        <div class="copy-block r">
+          <p>Mandás 10, 20, 50 CVs. Nada.</p>
+          <p>Ni un "no gracias". Ni un "recibimos tu postulación". Silencio total.</p>
+          <p>Y empezás a preguntarte: ¿Qué estoy haciendo mal? ¿Estoy muy viejo? ¿Muy joven? ¿Me falta experiencia? ¿Me sobra?</p>
+          <p>La realidad es peor.</p>
+          <p><strong>Nadie leyó tu CV.</strong></p>
+          <p>Antes de que un humano lo vea, un software llamado ATS escanea tu archivo en 6 segundos. Si no encuentra lo que busca, te descarta automáticamente.</p>
+          <p>Sin aviso. Sin explicación. Sin oportunidad.</p>
+          <p>Vos pensás que competís contra otros candidatos. Pero primero tenés que ganarle a una máquina.</p>
+        </div>
+
+        <div class="stat-card r d2">
+          <span class="stat-number">75%</span>
+          <p class="stat-text">de los CVs son descartados automáticamente antes de que un humano los vea</p>
+          <div class="stat-rule"></div>
+          <p class="stat-footnote">El tuyo puede estar entre ellos — y nunca lo sabrías.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== ENEMIGO ===================== -->
+  <section class="enemigo">
+    <div class="inner">
+      <span class="section-label section-label--muted">El filtro invisible</span>
+      <h2>El Filtro Invisible que te está frenando</h2>
+
+      <div class="enemigo-grid">
+        <div class="copy-block--dark r">
+          <p>Las empresas no tienen tiempo de leer 500 CVs para un puesto.</p>
+          <p>Por eso usan robots que filtran automáticamente. ¿El resultado?</p>
+          <p><strong>Tu CV puede ser perfecto para el puesto. Pero si el robot no lo entiende, no existís.</strong></p>
+          <p>Y lo peor: nadie te avisa. No hay un mail que diga "tu CV fue descartado por el sistema". Simplemente te ignoran.</p>
+          <p>Por eso mandás 50 CVs y sentís que gritás al vacío.</p>
+        </div>
+
+        <div class="ats-card r d2">
+          <div class="ats-card-label">Los robots filtran por</div>
+          <ul class="ats-list">
+            <li class="ats-item">
+              <div class="ats-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div>
+                <div class="ats-name">Palabras clave</div>
+                <div class="ats-desc">Las que vos no sabés cuáles son — y que el robot busca de forma exacta</div>
+              </div>
+            </li>
+            <li class="ats-item">
+              <div class="ats-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              </div>
+              <div>
+                <div class="ats-name">Formato del archivo</div>
+                <div class="ats-desc">Tu CV de Canva o con tablas puede ser ilegible para el sistema ATS</div>
+              </div>
+            </li>
+            <li class="ats-item">
+              <div class="ats-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h8"/></svg>
+              </div>
+              <div>
+                <div class="ats-name">Estructura del contenido</div>
+                <div class="ats-desc">Secciones en el orden y jerarquía que el sistema espera encontrar</div>
+              </div>
+            </li>
+          </ul>
+          <div class="ats-result">
+            <strong>Si el robot no te entiende, no existís.</strong> Sin importar cuánta experiencia tenés.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== SOLUCIÓN ===================== -->
+  <section class="solucion">
+    <div class="inner">
+      <span class="section-label">La solución</span>
+      <h2>Rumbo atraviesa el Filtro Invisible por vos</h2>
+      <p class="solucion-sub">Analizamos tu CV con la misma lógica que usan los sistemas ATS de las empresas.</p>
+
+      <div class="solucion-grid">
+        <div class="r">
+          <ul class="feature-list">
+            <li class="feature-row">
+              <div class="check-circle"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg></div>
+              <span class="feature-text">Qué errores te están descartando</span>
+            </li>
+            <li class="feature-row">
+              <div class="check-circle"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg></div>
+              <span class="feature-text">Qué palabras clave te faltan</span>
+            </li>
+            <li class="feature-row">
+              <div class="check-circle"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg></div>
+              <span class="feature-text">Qué tiene mal tu formato</span>
+            </li>
+          </ul>
+          <a href="#upload-zone" class="btn">
+            Quiero analizar mi CV gratis
+          </a>
+        </div>
+
+        <div class="copy-block r d2">
+          <p>Y después lo arreglamos.</p>
+          <p>En 24 horas tenés un CV nuevo, optimizado, listo para pasar el filtro y llegar a manos humanas.</p>
+          <p><strong>No te enseñamos a armar un CV. Te lo armamos.</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== PROCESO ===================== -->
+  <section class="proceso">
+    <div class="inner">
+      <span class="section-label">Proceso</span>
+      <h2>Cómo funciona</h2>
+
+      <div class="steps">
+        <div class="step r">
+          <div class="step-num">1</div>
+          <h3>Subí tu CV</h3>
+          <p>PDF o Word. Lo analizamos con la misma tecnología que usan las empresas para filtrarte.</p>
+          <div class="step-tag">⚡ 30 segundos</div>
+        </div>
+        <div class="step r d1">
+          <div class="step-num">2</div>
+          <h3>Mirá tu diagnóstico</h3>
+          <p>Tu puntaje de compatibilidad ATS y los errores críticos que te están descartando.</p>
+          <div class="step-tag">⚡ Instantáneo</div>
+        </div>
+        <div class="step r d2">
+          <div class="step-num">3</div>
+          <h3>Recibí tu CV optimizado</h3>
+          <p>CV reescrito, formato correcto y las palabras clave que necesitás para pasar el filtro.</p>
+          <div class="step-tag">✓ En 24 horas</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== UPLOAD ZONE ===================== -->
+  <section class="upload-section" id="upload-zone">
+    <div class="inner">
+      <span class="section-label">Probalo ahora</span>
+      <h2>Sabé tu puntaje en 30 segundos</h2>
+      <p class="upload-sub">Gratis. Sin registro. Sin tarjeta de crédito. — <button onclick="openDemoModal()" style="background:none;border:none;color:var(--green);font:inherit;font-size:0.875rem;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:0">Ver ejemplo de resultado</button></p>
+
+      <div class="dropzone r" id="dropzone"
+           ondragover="dzDragOver(event)"
+           ondragleave="dzDragLeave()"
+           ondrop="dzDrop(event)">
+
+        <input type="file" class="dz-input" id="file-input" accept=".pdf,.doc,.docx"
+               onchange="dzFileSelect(event)">
+
+        <!-- Estado por defecto -->
+        <div class="dz-default">
+          <div class="dz-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="dz-headline">Arrastrá tu CV acá</div>
+          <div class="dz-sub">o hacé click para seleccionar el archivo</div>
+          <div class="dz-formats">
+            <span class="dz-format">PDF</span>
+            <span class="dz-format-sep">·</span>
+            <span class="dz-format">DOC</span>
+            <span class="dz-format-sep">·</span>
+            <span class="dz-format">DOCX</span>
+          </div>
+        </div>
+
+        <!-- Estado: pregunta de puesto -->
+        <div class="dz-asking">
+          <div class="dz-asking-title">¿Para qué puesto estás aplicando?</div>
+          <p class="dz-asking-sub">Así el análisis es más preciso para vos.</p>
+          <input
+            type="text"
+            class="dz-asking-input"
+            id="puesto-input"
+            placeholder="Ej: ventas, sistemas, administración, diseño…"
+            maxlength="120"
+            onkeydown="if(event.key==='Enter') dzAnalyzarConPuesto()"
+          >
+          <div class="dz-asking-btns">
+            <button class="dz-asking-btn-primary" onclick="dzAnalyzarConPuesto()">Analizar para este puesto</button>
+            <button class="dz-asking-btn-secondary" onclick="dzAnalyzarSinPuesto()">Evaluar según lo que hay en mi CV</button>
+          </div>
+        </div>
+
+        <!-- Estado: analizando -->
+        <div class="dz-loading">
+          <div class="dz-spinner"></div>
+          <div class="dz-loading-text" id="dz-loading-text">Analizando formato...</div>
+          <div class="dz-loading-sub">Esto toma unos segundos</div>
+        </div>
+
+        <!-- Error message — shown if API call fails -->
+        <div class="dz-error-msg" id="dz-error-msg" role="alert"></div>
+
+        <!-- Estado: resultado parcial + paywall -->
+        <div class="dz-result">
+
+          <!-- Score + descripción -->
+          <div class="dz-result-top">
+            <div class="dz-result-score-block">
+              <div class="dz-result-score" id="dz-score">0</div>
+              <div class="dz-result-score-sub">/ 100 — Muy bajo</div>
+            </div>
+            <div class="dz-result-meta">
+              <div class="dz-result-title">Tu CV tiene 12 errores críticos</div>
+              <div class="dz-result-desc">Está siendo descartado automáticamente antes de llegar a un humano.</div>
+            </div>
+          </div>
+
+          <!-- Errores: 1 visible, resto bloqueado -->
+          <div class="dz-errors-list">
+
+            <!-- Error visible — prueba real del producto -->
+            <div class="dz-err dz-err--visible">
+              <span>Palabras clave faltantes para el puesto</span>
+              <span class="dz-err-badge">×8</span>
+            </div>
+
+            <!-- Errores bloqueados -->
+            <div class="dz-errors-locked">
+              <div class="dz-err dz-err--locked">
+                <span>Formato incompatible detectado</span>
+                <span class="dz-err-badge">×3</span>
+              </div>
+              <div class="dz-err dz-err--locked">
+                <span>Sin sección de habilidades técnicas</span>
+                <span class="dz-err-badge">×1</span>
+              </div>
+              <div class="dz-err dz-err--locked">
+                <span>Estructura de experiencia incorrecta</span>
+                <span class="dz-err-badge">×4</span>
+              </div>
+              <!-- Overlay de bloqueo -->
+              <div class="dz-lock-overlay">
+                <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                +9 errores más — desbloqueá para verlos todos
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Paywall CTA -->
+          <div class="dz-paywall">
+            <a href="#oferta" class="btn" style="width:100%;justify-content:center;" onclick="document.getElementById('oferta').style.display='';document.getElementById('oferta').scrollIntoView({behavior:'smooth'})">
+              Desbloquear análisis completo — $39.990
+            </a>
+            <p class="dz-paywall-note">Incluye <strong>CV reescrito y optimizado</strong> entregado en 24 horas</p>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== OFERTA ===================== -->
+  <section class="oferta" id="oferta" style="display:none">
+    <div class="inner">
+      <span class="section-label">Desbloqueá tu diagnóstico</span>
+      <h2>Los 12 errores + tu CV nuevo <span class="price">por $39.990</span></h2>
+      <p style="font-size:0.9375rem;color:var(--gray-ui);margin-top:-1rem;margin-bottom:var(--space-xl);">Menos que una foto de perfil profesional. Más impacto en tu búsqueda de trabajo.</p>
+
+      <div class="oferta-layout">
+        <div class="offer-card r">
+          <ul class="offer-items">
+            <li class="offer-item">
+              <div class="offer-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg></div>
+              <div>
+                <div class="offer-name">Análisis completo de tu CV</div>
+                <div class="offer-desc">Puntaje ATS + todos los errores detectados + keywords faltantes</div>
+              </div>
+            </li>
+            <li class="offer-item">
+              <div class="offer-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg></div>
+              <div>
+                <div class="offer-name">Tu CV reescrito y optimizado</div>
+                <div class="offer-desc">Formato ATS-compatible, verbos de acción, logros cuantificados</div>
+              </div>
+            </li>
+            <li class="offer-item">
+              <div class="offer-check"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg></div>
+              <div>
+                <div class="offer-name">Guía de aplicación</div>
+                <div class="offer-desc">Dónde buscar laburo en Argentina (los sitios que funcionan) y cómo aplicar para maximizar chances</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div style="margin-top:var(--space-lg);">
+          <a href="#" class="btn" style="width:100%;justify-content:center;">
+            Quiero mi CV optimizado — $39.990
+          </a>
+          <p style="font-size:0.8125rem;color:rgba(255,255,255,0.4);text-align:center;margin-top:0.75rem;">El análisis gratis ya lo tenés. Este es el siguiente paso.</p>
+        </div>
+
+        <div class="upsell-card r d2" id="upsell" onclick="toggleUpsell()">
+          <div class="upsell-header">
+            <div class="upsell-box" id="upsell-box">
+              <svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg>
+            </div>
+            <div>
+              <div class="upsell-title">Agregá el Kit de Aplicación</div>
+              <div class="upsell-price">+ $14.990</div>
+            </div>
+          </div>
+          <div class="upsell-divider"></div>
+          <ul class="upsell-items">
+            <li class="upsell-item">3 cartas de presentación personalizadas</li>
+            <li class="upsell-item">Template de mail de seguimiento post-aplicación</li>
+            <li class="upsell-item">Lista de 20 portales de empleo con mejor tasa de respuesta</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== TESTIMONIOS ===================== -->
+  <section class="testimonios">
+    <div class="inner">
+      <span class="section-label">Resultados reales</span>
+      <h2>Ellos también mandaban CVs sin respuesta</h2>
+
+      <div class="testimonios-grid">
+        <div class="card-t r">
+          <div class="card-t-stars">★★★★★</div>
+          <p class="card-t-body">"Llevaba 4 meses mandando CVs. Ni una entrevista. Pensé que era yo. Subí mi CV a Rumbo y me mostró 12 errores que hacían que los filtros automáticos me descarten. Lo arreglaron en 24 horas. A la semana siguiente tuve 3 entrevistas."</p>
+          <div class="card-t-author">
+            <div class="avatar"><img src="https://i.pravatar.cc/44?img=12" alt="Martín L." loading="lazy"></div>
+            <div>
+              <div class="author-name">Martín L.</div>
+              <div class="author-detail">32 años — Contador — Córdoba</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-t r d1">
+          <div class="card-t-stars">★★★★★</div>
+          <p class="card-t-body">"Mi CV lo había armado una amiga de RRHH. Estaba 'lindo'. Pero lindo no sirve si un robot no lo puede leer. Rumbo me mostró que tenía tablas y columnas que los sistemas ATS ni registran. Era invisible. Me lo reescribieron y ahora sí me llaman."</p>
+          <div class="card-t-author">
+            <div class="avatar"><img src="https://i.pravatar.cc/44?img=47" alt="Luciana M." loading="lazy"></div>
+            <div>
+              <div class="author-name">Luciana M.</div>
+              <div class="author-detail">28 años — Marketing — CABA</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-t r d2">
+          <div class="card-t-stars">★★★★★</div>
+          <p class="card-t-body">"Pensé que no me llamaban porque tengo 47 años. Que me descartaban por viejo. Pero el problema era que mi CV de 3 páginas no tenía las palabras clave que buscan los filtros. Rumbo me lo dejó en 1 página, optimizado. En 2 semanas conseguí laburo."</p>
+          <div class="card-t-author">
+            <div class="avatar"><img src="https://i.pravatar.cc/44?img=57" alt="Roberto D." loading="lazy"></div>
+            <div>
+              <div class="author-name">Roberto D.</div>
+              <div class="author-detail">47 años — Logística — Mendoza</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- CTA post-testimonios -->
+  <div style="background:var(--gray-bg);padding:0 var(--space-lg) var(--space-2xl);text-align:center;">
+    <a href="#upload-zone" class="btn" style="display:inline-flex;">
+      Analizá mi CV ahora
+    </a>
+  </div>
+
+
+  <!-- ===================== URGENCIA ===================== -->
+  <section class="urgencia">
+    <div class="inner">
+      <span class="section-label section-label--muted">Disponibilidad limitada</span>
+
+      <div class="urgencia-layout">
+        <div class="r">
+          <h2>No podemos ayudar a todos</h2>
+          <div class="copy-block--dark">
+            <p>Cada CV lo procesamos de forma personalizada: análisis real + reescritura humana + revisión final.</p>
+            <p>No es un template automático. Por eso limitamos a <strong>50 CVs por semana</strong>.</p>
+            <p>Cuando se agotan los cupos, cerramos hasta el lunes siguiente.</p>
+          </div>
+          <div class="urgencia-consequence r">
+            Cada día que tu CV sigue igual, perdés oportunidades que nunca vas a saber que existieron. Las empresas no te avisan que te descartaron. Simplemente te ignoran.
+          </div>
+        </div>
+
+        <div class="cupos-card r d2">
+          <div class="cupos-badge">
+            <span class="ping-dot"></span>
+            <span class="badge-text">Esta semana quedan 23 cupos disponibles</span>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-meta">
+              <span>27 ocupados</span>
+              <span>50 total</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+
+          <p class="cupos-note">Los cupos se actualizan cada lunes. Si se agotan esta semana, el próximo turno disponible es el lunes que viene.</p>
+
+          <a href="#upload-zone" class="btn btn--full">
+            Reservar mi cupo ahora
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== CTA FINAL ===================== -->
+  <section class="cta-final">
+    <div class="cta-final-inner">
+      <h2>En 24 horas podés tener un CV que funciona</h2>
+      <p class="cta-final-sub">O podés seguir mandando el mismo CV esperando un resultado distinto.</p>
+      <div class="cta-final-actions">
+        <a href="#upload-zone" class="btn">
+          Analizá tu CV ahora
+        </a>
+        <p class="cta-final-note">El análisis inicial es gratis. Ves tu puntaje y tus errores. Después decidís.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== FAQ ===================== -->
+  <section class="faq">
+    <div class="inner">
+      <span class="section-label">FAQ</span>
+      <h2>Preguntas frecuentes</h2>
+
+      <div class="faq-list">
+
+        <div class="faq-item open">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Cuánto tarda el análisis gratuito?
+            <span class="faq-toggle"><svg viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3"/></svg></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">30 segundos. Subís tu CV y ves tu puntaje ATS al instante.</div>
+          </div>
+        </div>
+
+        <div class="faq-item open">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Y el CV optimizado?
+            <span class="faq-toggle"><svg viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3"/></svg></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">Te lo enviamos por email en menos de 24 horas.</div>
+          </div>
+        </div>
+
+        <div class="faq-item open">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Sirve para cualquier profesión?
+            <span class="faq-toggle"><svg viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3"/></svg></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">Sí. Optimizamos CVs de todas las industrias: administración, IT, salud, comercio, logística, marketing, y más.</div>
+          </div>
+        </div>
+
+        <div class="faq-item open">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿El CV me lo dan en PDF o Word?
+            <span class="faq-toggle"><svg viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3"/></svg></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">Ambos. Te enviamos las dos versiones listas para usar.</div>
+          </div>
+        </div>
+
+        <div class="faq-item open">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Qué pasa si no me convence el resultado?
+            <span class="faq-toggle"><svg viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3"/></svg></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">Escribinos y lo revisamos sin costo adicional.</div>
+          </div>
+        </div>
+
+        <div class="faq-item open">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Por qué es limitado a 50 por semana?
+            <span class="faq-toggle"><svg viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3"/></svg></span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">Porque cada CV lo procesamos con atención individual. No es un generador automático.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">RUMBO<em> |</em></div>
+        <div class="footer-tagline">Tu carrera, tu rumbo.</div>
+      </div>
+      <div class="footer-right">
+        <a href="mailto:hola@rumbo.la" class="footer-mail">hola@rumbo.la</a>
+        <div class="footer-loc">Buenos Aires, Argentina</div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ===================== MODAL — Analysis result ===================== -->
+  <!-- Full-screen overlay, shown after CV analysis completes -->
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading"
+       onclick="handleModalOverlayClick(event)">
+    <div class="modal-card" id="modal-card">
+
+      <!-- Close button -->
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">
+        <svg viewBox="0 0 12 12">
+          <path d="M1 1l10 10M11 1L1 11"/>
+        </svg>
+      </button>
+
+      <!-- Score -->
+      <div class="modal-score-row">
+        <div class="modal-score-num" id="modal-score-num">0</div>
+        <div class="modal-score-of">/100</div>
+        <div class="modal-score-nivel" id="modal-score-nivel">Muy bajo</div>
+      </div>
+      <div class="modal-score-context">Los CVs que consiguen entrevistas puntúan por encima de 75.</div>
+
+      <!-- Problemas visibles (hasta 3) -->
+      <div class="modal-problems" id="modal-problems"></div>
+
+      <!-- Lock: problemas restantes -->
+      <div class="modal-problem-more" id="modal-problem-more">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span id="modal-locked-count">+N problemas más bloqueados</span>
+      </div>
+
+      <!-- Pain line -->
+      <div class="modal-pain-line">Con este score, tu CV es descartado automáticamente antes de que un humano lo vea.</div>
+
+      <!-- Pricing header dinámico -->
+      <div class="modal-pricing-header" id="modal-pricing-header">
+        Tu CV tiene <strong>problemas</strong> que te están costando entrevistas. Elegí cómo resolverlos.
+      </div>
+
+      <!-- Countdown timer -->
+      <div class="modal-timer">
+        <span>⚠️ Esta oferta expira en</span>
+        <span class="modal-timer-count" id="modal-timer-count">05:00</span>
+      </div>
+
+      <!-- Pricing tiers -->
+      <div class="modal-tiers">
+
+        <!-- Tier 1: CV Listo Para Enviar (featured) -->
+        <div class="modal-tier modal-tier--featured">
+          <div class="modal-tier-badge">más elegido</div>
+          <div class="modal-tier-name">CV Listo Para Enviar</div>
+          <div class="modal-tier-price-row">
+            <span class="modal-tier-price">$34.990</span>
+            <span class="modal-tier-price-anchor">$54.990</span>
+            <span class="modal-tier-discount">−36%</span>
+          </div>
+          <ul class="modal-tier-features">
+            <li>✅ Informe completo con todos los errores</li>
+            <li>✅ CV reescrito por especialista ATS</li>
+            <li>✅ Keywords del sector integradas</li>
+            <li>✅ Optimizado para el puesto que buscás</li>
+            <li>✅ Entregado en 24hs</li>
+            <li>✅ Garantía de devolución 7 días</li>
+          </ul>
+          <button class="modal-tier-btn modal-tier-btn--primary"
+                  id="btn-cv"
+                  onclick="initiatePayment('cv')">
+            Quiero mi CV nuevo
+          </button>
+          <div class="modal-tier-note">Pago único. Sin suscripción. Sin sorpresas.</div>
+        </div>
+
+        <!-- Tier 2: Solo el Informe -->
+        <div class="modal-tier">
+          <div class="modal-tier-name">Solo el Informe</div>
+          <div class="modal-tier-price-row">
+            <span class="modal-tier-price">$19.990</span>
+            <span class="modal-tier-price-anchor">$24.990</span>
+            <span class="modal-tier-discount">−20%</span>
+          </div>
+          <ul class="modal-tier-features">
+            <li>✅ Todos los errores desbloqueados</li>
+            <li>✅ Keywords faltantes</li>
+            <li>✅ Instrucciones para corregirlo vos mismo</li>
+            <li class="feat-no">❌ CV no reescrito</li>
+          </ul>
+          <button class="modal-tier-btn modal-tier-btn--secondary"
+                  id="btn-informe"
+                  onclick="initiatePayment('informe')">
+            Ver informe completo
+          </button>
+          <div class="modal-tier-note">Pago único. Sin suscripción.</div>
+        </div>
+
+      </div>
+
+      <!-- Social proof -->
+      <div class="modal-social-proof">847 personas mejoraron su CV esta semana con Rumbo.</div>
+
+      <!-- Cara humana -->
+      <div class="modal-human">
+        <div class="modal-human-avatar">VR</div>
+        <div>
+          <div class="modal-human-name">Valentina Rodríguez</div>
+          <div class="modal-human-bio">Cada CV es revisado por Valentina, especialista en reclutamiento con 8 años de experiencia en LATAM.</div>
+        </div>
+      </div>
+
+      <!-- Costo de no actuar -->
+      <div class="modal-cost-line">El candidato promedio manda 47 CVs antes de conseguir una entrevista. Con un CV optimizado, ese número baja a 8.</div>
+
+    </div>
+  </div>
+
+
+  <!-- ===================== STICKY BAR ===================== -->
+  <div class="sticky-bar" id="sticky-bar">
+    <div class="sticky-bar-inner">
+      <div class="sticky-bar-copy">
+        <div class="sticky-bar-headline">Tu CV está siendo descartado por un robot</div>
+      </div>
+      <div class="sticky-bar-right">
+        <a href="#upload-zone" class="btn btn--sm">
+          Analizá ahora
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================== JS ===================== -->
+  <script>
+    // -----------------------------------------------
+    // API configuration — change for production
+    // -----------------------------------------------
+    const API_URL = 'https://rumbo-six.vercel.app';
+
+    // Session ID returned by the backend after analysis
+    let currentSession = null;
+
+    // -----------------------------------------------
+    // FAQ accordion — one open at a time
+    // -----------------------------------------------
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // -----------------------------------------------
+    // Upsell checkbox
+    // -----------------------------------------------
+    function toggleUpsell() {
+      document.getElementById('upsell').classList.toggle('active');
+    }
+
+    // -----------------------------------------------
+    // Scroll reveal
+    // -----------------------------------------------
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -36px 0px' });
+    document.querySelectorAll('.r').forEach(el => io.observe(el));
+
+    // -----------------------------------------------
+    // Nav border on scroll
+    // -----------------------------------------------
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.style.borderBottomColor = scrollY > 24 ? 'rgba(255,255,255,0.08)' : 'transparent';
+    }, { passive: true });
+
+    // -----------------------------------------------
+    // ATS Score mockup — count-up animation
+    // Reusable: countUp(el, barEl, target, duration)
+    // barEl can be null if no progress bar to animate
+    // -----------------------------------------------
+    const TARGET_SCORE = 34;
+
+    function countUp(el, barEl, target, duration) {
+      let start = null;
+      const step = (ts) => {
+        if (!start) start = ts;
+        const p = Math.min((ts - start) / duration, 1);
+        // easeOutExpo for dramatic deceleration
+        const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+        const val = Math.round(eased * target);
+        el.textContent = val;
+        if (barEl) barEl.style.width = (eased * target) + '%';
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    // Hero mockup: animate score once visible
+    const mockupEl  = document.getElementById('ats-mockup');
+    const scoreNum  = document.getElementById('score-num');
+    const scoreBar  = document.getElementById('score-bar');
+    let scoreAnimated = false;
+
+    const mockupObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !scoreAnimated) {
+          scoreAnimated = true;
+          setTimeout(() => countUp(scoreNum, scoreBar, TARGET_SCORE, 1600), 300);
+          mockupObserver.unobserve(mockupEl);
+        }
+      });
+    }, { threshold: 0.3 });
+    if (mockupEl) mockupObserver.observe(mockupEl);
+
+    // -----------------------------------------------
+    // Upload zone — drag & drop interaction
+    // -----------------------------------------------
+    const dropzone = document.getElementById('dropzone');
+
+    function dzDragOver(e) {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    }
+    function dzDragLeave() {
+      dropzone.classList.remove('dragover');
+    }
+    let pendingFile = null;
+
+    function dzDrop(e) {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      const file = e.dataTransfer?.files[0];
+      if (file) dzShowAsking(file);
+    }
+    function dzFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) dzShowAsking(file);
+    }
+
+    function dzShowAsking(file) {
+      pendingFile = file;
+      dropzone.classList.add('asking');
+      const input = document.getElementById('puesto-input');
+      if (input) { input.value = ''; setTimeout(() => input.focus(), 100); }
+    }
+
+    function dzAnalyzarConPuesto() {
+      const puesto = (document.getElementById('puesto-input')?.value || '').trim();
+      dropzone.classList.remove('asking');
+      handleFile(pendingFile, puesto || null);
+    }
+
+    function dzAnalyzarSinPuesto() {
+      dropzone.classList.remove('asking');
+      handleFile(pendingFile, null);
+    }
+
+    // Show a red error message below the dropzone content
+    function showError(msg) {
+      const el = document.getElementById('dz-error-msg');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('visible');
+      // Auto-hide after 8s
+      setTimeout(() => el.classList.remove('visible'), 8000);
+    }
+
+    // -----------------------------------------------
+    // handleFile — real API call (replaces fake timeout)
+    // -----------------------------------------------
+    async function handleFile(file, puesto) {
+      // Hide any previous error
+      const errEl = document.getElementById('dz-error-msg');
+      if (errEl) errEl.classList.remove('visible');
+
+      dropzone.classList.add('analyzing');
+      startLoadingAnimation();
+
+      try {
+        const formData = new FormData();
+        formData.append('cv', file);
+        if (puesto) formData.append('puesto', puesto);
+
+        const res  = await fetch(`${API_URL}/api/analyze`, { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.error || 'Error al analizar el CV.');
+
+        // Store session for payment
+        currentSession = data.partial.sessionId;
+
+        // Show result state in dropzone
+        stopLoadingAnimation();
+        dropzone.classList.remove('analyzing');
+        dropzone.classList.add('done');
+
+        // Animate score counter in the dropzone result area
+        const dzScore = document.getElementById('dz-score');
+        if (dzScore) countUp(dzScore, null, data.partial.score, 900);
+
+        // Update the static sub-text in the result area with real data
+        const dzTitle = dropzone.querySelector('.dz-result-title');
+        const dzDesc  = dropzone.querySelector('.dz-result-desc');
+        if (dzTitle) dzTitle.textContent = `Tu CV tiene ${data.partial.errores_total} errores críticos`;
+        if (dzDesc)  dzDesc.textContent  = data.partial.resumen || 'Tu CV está siendo descartado antes de llegar a un humano.';
+
+        // Show the visible error preview
+        const dzVisibleErr = dropzone.querySelector('.dz-err--visible span:first-child');
+        if (dzVisibleErr && data.partial.errores_preview?.[0]) {
+          const e = data.partial.errores_preview[0];
+          dzVisibleErr.textContent = e.descripcion || '';
+          const badge = dropzone.querySelector('.dz-err--visible .dz-err-badge');
+          if (badge) badge.textContent = `×${e.cantidad ?? 1}`;
+        }
+
+        // Update locked errors overlay count
+        const lockOverlay = dropzone.querySelector('.dz-lock-overlay');
+        if (lockOverlay) {
+          const lockedCount = Math.max(0, data.partial.errores_total - 1);
+          lockOverlay.innerHTML = `<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>+${lockedCount} errores más — desbloqueá para verlos todos`;
+        }
+
+        // Open modal after a brief pause (lets user see dropzone result first)
+        setTimeout(() => openModal(data.partial), 800);
+
+      } catch (err) {
+        stopLoadingAnimation();
+        dropzone.classList.remove('analyzing');
+        showError(err.message || 'Error al analizar. Intentá de nuevo.');
+      }
+    }
+
+    // -----------------------------------------------
+    // Loading text animation
+    // -----------------------------------------------
+    const LOADING_STEPS = [
+      'Analizando formato...',
+      'Verificando compatibilidad ATS...',
+      'Detectando keywords faltantes...',
+      'Calculando score de visibilidad...',
+    ];
+    let loadingInterval = null;
+
+    function startLoadingAnimation() {
+      const el = document.getElementById('dz-loading-text');
+      if (!el) return;
+      let i = 0;
+      el.textContent = LOADING_STEPS[0];
+      el.style.opacity = '1';
+      loadingInterval = setInterval(() => {
+        el.style.opacity = '0';
+        setTimeout(() => {
+          i = (i + 1) % LOADING_STEPS.length;
+          el.textContent = LOADING_STEPS[i];
+          el.style.opacity = '1';
+        }, 280);
+      }, 1800);
+    }
+
+    function stopLoadingAnimation() {
+      if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+    }
+
+    // -----------------------------------------------
+    // Countdown timer for modal
+    // -----------------------------------------------
+    let timerInterval = null;
+
+    function startModalTimer() {
+      const el = document.getElementById('modal-timer-count');
+      if (!el) return;
+      if (timerInterval) clearInterval(timerInterval);
+      const end = Date.now() + 5 * 60 * 1000;
+      function tick() {
+        const rem = Math.max(0, end - Date.now());
+        const m = Math.floor(rem / 60000);
+        const s = Math.floor((rem % 60000) / 1000);
+        el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        el.style.color = rem <= 60000 ? '#FF4F4F' : 'var(--navy)';
+        if (rem <= 0) clearInterval(timerInterval);
+      }
+      tick();
+      timerInterval = setInterval(tick, 1000);
+    }
+
+    // -----------------------------------------------
+    // Modal — open / close / overlay click / ESC key
+    // -----------------------------------------------
+    function colorClass(pct) {
+      return pct < 40 ? 'low' : pct < 65 ? 'mid' : 'high';
+    }
+
+    function openModal(partial) {
+      const modal = document.getElementById('modal');
+      if (!modal) return;
+
+      const score  = partial.score ?? 0;
+      const cls    = colorClass(score);
+      const clrMap = { low: '#FF4F4F', mid: '#FF9A3C', high: 'var(--green)' };
+      const clr    = clrMap[cls];
+
+      // --- Score ---
+      const scoreEl = document.getElementById('modal-score-num');
+      const nivelEl = document.getElementById('modal-score-nivel');
+      if (scoreEl) {
+        scoreEl.textContent = '0';
+        scoreEl.style.color = clr;
+        setTimeout(() => countUp(scoreEl, null, score, 1100), 120);
+      }
+      if (nivelEl) {
+        nivelEl.textContent = partial.nivel || '';
+        nivelEl.style.color = clr;
+        nivelEl.style.background = clr + '18';
+        nivelEl.style.borderColor = clr + '33';
+      }
+
+      // --- Problemas (hasta 3 del preview) ---
+      const problemsEl    = document.getElementById('modal-problems');
+      const moreEl        = document.getElementById('modal-problem-more');
+      const lockedCountEl = document.getElementById('modal-locked-count');
+      const errores = Array.isArray(partial.errores_preview) ? partial.errores_preview : [];
+      const total   = partial.errores_total || 0;
+
+      if (problemsEl) {
+        problemsEl.innerHTML = errores.map(e =>
+          `<div class="modal-problem-item">
+            <span class="modal-problem-icon">❌</span>
+            <span class="modal-problem-text">${e.descripcion || ''}</span>
+          </div>`
+        ).join('');
+      }
+
+      const locked = Math.max(0, total - errores.length);
+      if (moreEl) moreEl.style.display = locked > 0 ? 'flex' : 'none';
+      if (lockedCountEl) lockedCountEl.textContent = `+${locked} problemas más bloqueados`;
+
+      // --- Pricing header dinámico ---
+      const pricingHeaderEl = document.getElementById('modal-pricing-header');
+      if (pricingHeaderEl) {
+        pricingHeaderEl.innerHTML = `Tu CV tiene <strong>${total} problemas</strong> que te están costando entrevistas. Elegí cómo resolverlos.`;
+      }
+
+      // --- Timer ---
+      startModalTimer();
+
+      // --- Show modal ---
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Demo modal — lets user preview the UI without uploading
+    function openDemoModal() {
+      openModal({
+        score: 34,
+        nivel: 'Muy bajo',
+        errores_total: 11,
+        errores_preview: [
+          { descripcion: 'Formato con tablas: 8 de cada 10 sistemas ATS no pueden leer el contenido.', categoria: 'formato' },
+          { descripcion: 'Ningún logro cuantificable en los 3 trabajos listados (sin números, porcentajes ni montos).', categoria: 'logros' },
+          { descripcion: 'Keywords del sector ausentes: gestión de equipos, KPIs, reporting, Excel avanzado.', categoria: 'keywords' },
+        ],
+      });
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('modal');
+      if (!modal) return;
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    // Click on the overlay (not the card) closes the modal
+    function handleModalOverlayClick(event) {
+      if (event.target === document.getElementById('modal')) {
+        closeModal();
+      }
+    }
+
+    // ESC key closes modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // -----------------------------------------------
+    // initiatePayment — call backend to create MP checkout
+    // -----------------------------------------------
+    async function initiatePayment(tier) {
+      if (!currentSession) return;
+
+      // Disable both buttons while processing
+      const btnInfome = document.getElementById('btn-informe');
+      const btnCv     = document.getElementById('btn-cv');
+      const targetBtn = tier === 'informe' ? btnInfome : btnCv;
+      if (targetBtn) {
+        targetBtn.disabled = true;
+        targetBtn.textContent = 'Cargando…';
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/payment/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: currentSession, tier }),
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          // Redirect to MercadoPago checkout
+          window.location.href = data.checkoutUrl;
+        } else {
+          alert(data.error || 'No se pudo iniciar el pago. Intentá de nuevo.');
+          if (targetBtn) {
+            targetBtn.disabled = false;
+            targetBtn.textContent = tier === 'informe' ? 'Desbloquear informe' : 'Quiero mi CV nuevo';
+          }
+        }
+      } catch (err) {
+        console.error('[payment] Error:', err);
+        alert('Error de conexión. Revisá tu internet e intentá de nuevo.');
+        if (targetBtn) {
+          targetBtn.disabled = false;
+          targetBtn.textContent = tier === 'informe' ? 'Desbloquear informe' : 'Quiero mi CV nuevo';
+        }
+      }
+    }
+
+    // -----------------------------------------------
+    // Post-payment: handle ?payment=success&session=X
+    // Called on page load if redirected back from MP
+    // -----------------------------------------------
+    (async function checkPostPayment() {
+      const params    = new URLSearchParams(window.location.search);
+      const status    = params.get('payment');
+      const sessionId = params.get('session');
+
+      if (status !== 'success' || !sessionId) return;
+
+      // Clean up the URL without reloading the page
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
+
+      try {
+        const res  = await fetch(`${API_URL}/api/analyze/unlock/${sessionId}`);
+        const data = await res.json();
+
+        if (data.ok && data.analysis) {
+          showSuccessModal(data.analysis, data.tier);
+        } else {
+          // If not yet marked paid (webhook race condition), show a friendly message
+          alert('¡Pago recibido! Tu análisis estará disponible en instantes. Si no aparece, refrescá la página en unos segundos.');
+        }
+      } catch (err) {
+        console.error('[post-payment] Error:', err);
+      }
+    })();
+
+    // Show a success state modal with the full unlocked analysis
+    function showSuccessModal(analysis, tier) {
+      // Re-use the existing modal but populate with full data
+      currentSession = null; // no payment needed
+
+      const partial = {
+        score:          analysis.score,
+        nivel:          analysis.nivel,
+        resumen:        analysis.resumen,
+        errores_total:  analysis.errores?.length ?? 0,
+        errores_preview: analysis.errores?.slice(0, 1) ?? [],
+      };
+      openModal(partial);
+
+      // Replace the lock overlay with a success message
+      const lockedWrap = document.getElementById('modal-locked-wrap');
+      if (lockedWrap) {
+        lockedWrap.innerHTML = `
+          <div style="padding:var(--space-md);background:rgba(0,210,106,0.07);border:1px solid rgba(0,210,106,0.2);border-radius:8px;font-size:0.875rem;color:var(--navy);line-height:1.55;">
+            <strong style="color:var(--green);">✓ Pago confirmado</strong> — Recibirás tu informe completo
+            ${tier === 'cv' ? 'y tu CV reescrito' : ''} por email en las próximas 24 horas.
+          </div>`;
+      }
+
+      // Replace the tier buttons with a single "cerrar" CTA
+      const tiersEl = document.querySelector('.modal-tiers');
+      if (tiersEl) {
+        tiersEl.innerHTML = `
+          <div style="grid-column:1/-1;">
+            <button class="modal-tier-btn modal-tier-btn--secondary" onclick="closeModal()">
+              Cerrar
+            </button>
+          </div>`;
+      }
+
+      const expiryEl = document.querySelector('.modal-expiry');
+      if (expiryEl) expiryEl.textContent = '';
+    }
+
+    // -----------------------------------------------
+    // Sticky bar — appears when hero CTA leaves viewport
+    // -----------------------------------------------
+    const stickyBar = document.getElementById('sticky-bar');
+    const heroCta   = document.getElementById('hero-cta');
+
+    const stickyObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        stickyBar.classList.toggle('visible', !e.isIntersecting);
+      });
+    }, { threshold: 0 });
+    stickyObserver.observe(heroCta);
+  </script>
+
+</body>
+</html>
