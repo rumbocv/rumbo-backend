@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 const { get, markPaid }   = require('../services/sessions.js');
 const { sendMetaEvent }   = require('../services/meta.js');
+const { trackEvent }      = require('../services/events.js');
 
 const router   = Router();
 const mpClient = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN || '' });
@@ -33,6 +34,8 @@ router.post('/create', async (req, res) => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5500';
 
   try {
+    trackEvent('checkout', { tier }).catch(err => console.error('[trackEvent/checkout]', err.message));
+
     const preference = new Preference(mpClient);
     const result = await preference.create({
       body: {
@@ -79,6 +82,9 @@ router.post('/webhook', async (req, res) => {
 
     const updated = await markPaid(sessionId, tier);
     if (updated) {
+      trackEvent('purchase', { tier, amount: TIERS[tier]?.unit_price }).catch(err =>
+        console.error('[trackEvent/purchase]', err.message)
+      );
       sendMetaEvent('Purchase', {
         eventId:    `purchase_${paymentId}`,
         customData: {

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rumbo — Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f9fafb;
+      color: #0f1f3d;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #0f1f3d;
+      color: #ffffff;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header .brand {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    header .brand span {
+      color: #22c55e;
+    }
+
+    header button {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    header button:hover {
+      background: rgba(255,255,255,0.12);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f1f3d;
+      margin-bottom: 16px;
+    }
+
+    /* Stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 22px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border: 1px solid #e5e7eb;
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+      font-size: 36px;
+      font-weight: 800;
+      color: #0f1f3d;
+      line-height: 1;
+    }
+
+    .stat-card.green .value  { color: #16a34a; }
+    .stat-card.navy  .value  { color: #0f1f3d; }
+
+    /* Table */
+    .table-section {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border: 1px solid #e5e7eb;
+      overflow: hidden;
+    }
+
+    .table-section .table-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-section .table-header h2 {
+      margin: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead tr {
+      background: #f3f4f6;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #6b7280;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f3f4f6;
+      color: #111827;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge.paid {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge.free {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .score-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-bar .bar {
+      flex: 1;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .score-bar .fill {
+      height: 100%;
+      border-radius: 99px;
+      background: #22c55e;
+    }
+
+    .nivel-tag {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 32px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .stats-row { grid-template-columns: 1fr; }
+      th, td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">Rumbo<span>.</span> Admin</div>
+    <button id="logoutBtn">Cerrar sesión</button>
+  </header>
+
+  <main>
+    <div class="stats-row">
+      <div class="stat-card navy">
+        <div class="label">Visitas (30 días)</div>
+        <div class="value" id="statVisit">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Checkouts (30 días)</div>
+        <div class="value" id="statCheckout">—</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">Compras (30 días)</div>
+        <div class="value" id="statPurchase">—</div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <div class="table-header">
+        <h2>CVs analizados</h2>
+      </div>
+      <div id="tableContainer">
+        <div class="loading">Cargando...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    const ADMIN_EMAIL = 'ramiro.suarezf@gmail.com';
+    let supabaseClient = null;
+    let accessToken    = null;
+
+    async function initSupabase() {
+      const res = await fetch('/api/admin/config');
+      const { supabaseUrl, supabaseAnonKey } = await res.json();
+      supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    }
+
+    async function checkAuth() {
+      // Try to restore session from localStorage
+      const stored = localStorage.getItem('rumbo_admin_session');
+      if (!stored) return redirect();
+
+      let session;
+      try { session = JSON.parse(stored); } catch { return redirect(); }
+
+      // Refresh session via Supabase
+      const { data, error } = await supabaseClient.auth.setSession({
+        access_token:  session.access_token,
+        refresh_token: session.refresh_token,
+      });
+
+      if (error || !data.session) return redirect();
+      if (data.session.user.email !== ADMIN_EMAIL) return redirect();
+
+      accessToken = data.session.access_token;
+      localStorage.setItem('rumbo_admin_session', JSON.stringify(data.session));
+    }
+
+    function redirect() {
+      localStorage.removeItem('rumbo_admin_session');
+      window.location.href = '/login';
+    }
+
+    async function authFetch(url) {
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+      return res.json();
+    }
+
+    async function loadStats() {
+      try {
+        const { stats } = await authFetch('/api/admin/stats');
+        if (!stats) return;
+        document.getElementById('statVisit').textContent    = stats.visit    ?? 0;
+        document.getElementById('statCheckout').textContent = stats.checkout ?? 0;
+        document.getElementById('statPurchase').textContent = stats.purchase ?? 0;
+      } catch (err) {
+        console.error('[stats]', err);
+      }
+    }
+
+    async function loadCVs() {
+      const container = document.getElementById('tableContainer');
+      try {
+        const { cvs } = await authFetch('/api/admin/cvs');
+
+        if (!cvs || cvs.length === 0) {
+          container.innerHTML = '<div class="empty-state">No hay CVs registrados aún.</div>';
+          return;
+        }
+
+        const rows = cvs.map(cv => {
+          const date     = cv.created_at ? new Date(cv.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+          const score    = cv.score != null ? cv.score : null;
+          const scoreBar = score != null
+            ? `<div class="score-bar"><span style="min-width:30px">${score}</span><div class="bar"><div class="fill" style="width:${score}%"></div></div></div>`
+            : '—';
+          const nivel    = cv.nivel ? `<span class="nivel-tag">${cv.nivel}</span>` : '—';
+          const estado   = cv.paid
+            ? '<span class="badge paid">Pago</span>'
+            : '<span class="badge free">Gratis</span>';
+          const plan     = cv.tier || '—';
+          const archivo  = cv.filename || '—';
+
+          return `<tr>
+            <td>${date}</td>
+            <td>${scoreBar}</td>
+            <td>${nivel}</td>
+            <td>${estado}</td>
+            <td>${plan}</td>
+            <td style="color:#6b7280;font-size:12px">${archivo}</td>
+          </tr>`;
+        }).join('');
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Score</th>
+                <th>Nivel</th>
+                <th>Estado</th>
+                <th>Plan</th>
+                <th>Archivo</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      } catch (err) {
+        console.error('[cvs]', err);
+        container.innerHTML = '<div class="empty-state">Error al cargar los datos.</div>';
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      localStorage.removeItem('rumbo_admin_session');
+      window.location.href = '/login';
+    });
+
+    (async () => {
+      try {
+        await initSupabase();
+        await checkAuth();
+        await Promise.all([loadStats(), loadCVs()]);
+      } catch (err) {
+        console.error('[admin init]', err);
+        redirect();
+      }
+    })();
+  </script>
+</body>
+</html>

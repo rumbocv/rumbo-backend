@@ -46,7 +46,7 @@ router.post('/', upload.single('cv'), async (req, res) => {
     }
 
     const sessionId = uuid();
-    await save(sessionId, analysis);
+    await save(sessionId, analysis, req.file.originalname);
 
     const partial = {
       sessionId,

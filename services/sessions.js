@@ -7,8 +7,10 @@ const supabase = createClient(
 
 const TTL_HOURS = 48;
 
-async function save(id, data) {
-  await supabase.from('sessions').insert({ id, data });
+async function save(id, data, filename = null) {
+  const record = { id, data };
+  if (filename) record.filename = filename;
+  await supabase.from('sessions').insert(record);
 }
 
 async function get(id) {
