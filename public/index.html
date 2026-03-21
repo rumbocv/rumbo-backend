@@ -21,6 +21,7 @@
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '904043962618454');
     fbq('track', 'PageView');
+    console.log('%c[Pixel] PageView fired', 'color: #1877F2; font-weight: bold');
   </script>
   <noscript>
     <img height="1" width="1" style="display:none"
@@ -3106,7 +3107,9 @@
     const API_URL = 'https://rumbo-six.vercel.app';
 
     // Track page visit (CAPI PageView)
-    fetch(`${API_URL}/api/track/visit`, { method: 'POST' }).catch(() => {});
+    fetch(`${API_URL}/api/track/visit`, { method: 'POST' })
+      .then(() => console.log('%c[CAPI] PageView fired', 'color: #1877F2; font-weight: bold'))
+      .catch(err => console.warn('[CAPI] PageView error:', err));
 
     // Session ID returned by the backend after analysis
     let currentSession = null;
@@ -3258,6 +3261,7 @@
         const data = await res.json();
 
         if (!data.ok) throw new Error(data.error || 'Error al analizar el CV.');
+        console.log('%c[CAPI] Lead fired', 'color: #1877F2; font-weight: bold');
 
         // Store session for payment
         currentSession = data.partial.sessionId;
