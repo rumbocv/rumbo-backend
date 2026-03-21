@@ -30,8 +30,8 @@ router.post('/create', async (req, res) => {
   if (!session) return res.status(404).json({ ok: false, error: 'Sesión no encontrada o expirada.' });
 
   const tierData    = TIERS[tier];
-  const apiUrl      = process.env.API_URL      || 'http://localhost:3001';
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5500';
+  const apiUrl      = process.env.API_URL      || 'https://rumbo-six.vercel.app';
+  const frontendUrl = process.env.FRONTEND_URL || 'https://rumbo-six.vercel.app';
 
   try {
     trackEvent('checkout', { tier }).catch(err => console.error('[trackEvent/checkout]', err.message));
