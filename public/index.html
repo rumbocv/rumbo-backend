@@ -1940,6 +1940,150 @@
     ========================================= */
 
     /* Overlay — hidden by default, fades in on .open */
+    /* ===== INLINE RESULTS SECTION ===== */
+    .inline-results-section {
+      background: var(--white);
+      padding: var(--space-xl) 0;
+      border-top: 1.5px solid var(--border-light);
+    }
+    .ir-top {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .ir-score-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .ir-score-num {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--navy);
+    }
+    .ir-score-sub {
+      font-size: 0.8125rem;
+      color: var(--gray-ui);
+      margin-top: 2px;
+    }
+    .ir-meta-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.25rem;
+    }
+    .ir-meta-desc {
+      font-size: 0.9rem;
+      color: var(--gray-ui);
+    }
+    .ir-problems {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .ir-problem-item {
+      display: flex;
+      gap: 0.625rem;
+      font-size: 0.9rem;
+      color: var(--navy);
+      background: rgba(255,79,79,0.05);
+      border: 1px solid rgba(255,79,79,0.12);
+      border-radius: 8px;
+      padding: 0.625rem 0.75rem;
+      line-height: 1.45;
+    }
+    .ir-timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--gray-ui);
+      margin-bottom: 1.25rem;
+      justify-content: center;
+    }
+    .ir-timer {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--navy);
+    }
+    .ir-timer.urgent { color: #FF4F4F; }
+    .ir-pricing-header {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .ir-tiers {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    .ir-tier {
+      border: 1.5px solid var(--border-light);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .ir-tier--featured {
+      border-color: var(--navy);
+      background: rgba(10,22,40,0.03);
+    }
+    .ir-tier-badge {
+      display: inline-block;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-bottom: 0.5rem;
+    }
+    .ir-tier-name {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.375rem;
+    }
+    .ir-tier-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .ir-tier-price { font-size: 1.5rem; font-weight: 800; color: var(--navy); }
+    .ir-tier-price-anchor { font-size: 0.9375rem; color: var(--gray-ui); text-decoration: line-through; }
+    .ir-tier-discount { font-size: 0.8125rem; font-weight: 700; color: var(--green); background: rgba(0,210,106,0.1); padding: 1px 6px; border-radius: 4px; }
+    .ir-tier-features {
+      list-style: none;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+    .ir-tier-features li { font-size: 0.875rem; color: var(--navy); }
+    .ir-tier-features li.feat-no { color: rgba(10,22,40,0.35); }
+    .ir-tier-btn {
+      width: 100%;
+      padding: 0.875rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      font-family: inherit;
+    }
+    .ir-tier-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .ir-tier-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .ir-tier-btn--primary { background: var(--navy); color: #fff; }
+    .ir-tier-btn--secondary { background: transparent; border: 1.5px solid var(--navy); color: var(--navy); }
+
     #modal {
       position: fixed;
       inset: 0;
@@ -2145,12 +2289,9 @@
     /* Pricing tiers grid */
     .modal-tiers {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 0.75rem;
       margin-bottom: 1rem;
-    }
-    @media (max-width: 500px) {
-      .modal-tiers { grid-template-columns: 1fr; }
     }
 
     .modal-tier {
@@ -2702,6 +2843,68 @@
     </div>
   </section>
 
+
+  <!-- ===================== INLINE RESULTS ===================== -->
+  <section class="inline-results-section" id="inline-results" style="display:none">
+    <div class="inner">
+      <div class="ir-top">
+        <div class="ir-score-block">
+          <div class="ir-score-num" id="ir-score-num">0</div>
+          <div class="ir-score-sub" id="ir-score-sub">/ 100</div>
+        </div>
+        <div>
+          <div class="ir-meta-title" id="ir-meta-title"></div>
+          <div class="ir-meta-desc" id="ir-meta-desc"></div>
+        </div>
+      </div>
+
+      <div class="ir-problems" id="ir-problems"></div>
+
+      <div class="ir-timer-wrap">
+        <span>Oferta expira en:</span>
+        <span class="ir-timer" id="ir-timer">05:00</span>
+      </div>
+
+      <div class="ir-pricing-header" id="ir-pricing-header"></div>
+
+      <div class="ir-tiers">
+        <div class="ir-tier ir-tier--featured">
+          <div class="ir-tier-badge">más elegido</div>
+          <div class="ir-tier-name">CV Listo Para Enviar</div>
+          <div class="ir-tier-price-row">
+            <span class="ir-tier-price">$34.990</span>
+            <span class="ir-tier-price-anchor">$54.990</span>
+            <span class="ir-tier-discount">−36%</span>
+          </div>
+          <ul class="ir-tier-features">
+            <li>✓ Informe completo de errores</li>
+            <li>✓ CV reescrito y optimizado</li>
+            <li>✓ Listo para enviar en 24hs</li>
+            <li>✓ Keywords del sector incluidas</li>
+          </ul>
+          <button class="ir-tier-btn ir-tier-btn--primary" id="ir-btn-cv"
+                  onclick="initiatePayment('cv')">Quiero mi CV nuevo</button>
+        </div>
+
+        <div class="ir-tier">
+          <div class="ir-tier-name">Solo el Informe</div>
+          <div class="ir-tier-price-row">
+            <span class="ir-tier-price">$19.990</span>
+            <span class="ir-tier-price-anchor">$24.990</span>
+            <span class="ir-tier-discount">−20%</span>
+          </div>
+          <ul class="ir-tier-features">
+            <li>✓ Todos los errores detectados</li>
+            <li>✓ Keywords faltantes</li>
+            <li>✓ Diagnóstico por categoría</li>
+            <li class="feat-no">✗ CV reescrito</li>
+          </ul>
+          <button class="ir-tier-btn ir-tier-btn--secondary" id="ir-btn-informe"
+                  onclick="initiatePayment('informe')">Desbloquear informe</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ===================== OFERTA ===================== -->
   <section class="oferta" id="oferta" style="display:none">
@@ -3424,9 +3627,40 @@
       // --- Timer ---
       startModalTimer();
 
+      // --- Populate inline results section ---
+      populateInlineResults(partial, score, clr);
+
       // --- Show modal ---
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
+    }
+
+    function populateInlineResults(partial, score, clr) {
+      const scoreEl = document.getElementById('ir-score-num');
+      const subEl   = document.getElementById('ir-score-sub');
+      const titleEl = document.getElementById('ir-meta-title');
+      const descEl  = document.getElementById('ir-meta-desc');
+      const probsEl = document.getElementById('ir-problems');
+      const hdrEl   = document.getElementById('ir-pricing-header');
+
+      const total   = partial.errores_total || 0;
+      const errores = Array.isArray(partial.errores_preview) ? partial.errores_preview : [];
+
+      if (scoreEl) { scoreEl.textContent = score; scoreEl.style.color = clr; }
+      if (subEl)   subEl.textContent = `/ 100 — ${partial.nivel || ''}`;
+      if (titleEl) titleEl.textContent = `Tu CV tiene ${total} problemas que te están costando entrevistas`;
+      if (descEl)  descEl.textContent  = partial.resumen || '';
+      if (hdrEl)   hdrEl.innerHTML     = `Tu CV tiene <strong>${total} problemas</strong>. Elegí cómo resolverlos.`;
+
+      if (probsEl) {
+        probsEl.innerHTML = errores.map(e =>
+          `<div class="ir-problem-item"><span>❌</span><span>${e.descripcion || ''}</span></div>`
+        ).join('');
+        const locked = Math.max(0, total - errores.length);
+        if (locked > 0) {
+          probsEl.innerHTML += `<div class="ir-problem-item" style="opacity:0.5;filter:blur(3px);user-select:none"><span>❌</span><span>+${locked} problemas más bloqueados</span></div>`;
+        }
+      }
     }
 
     // Demo modal — lets user preview the UI without uploading
@@ -3443,12 +3677,39 @@
       });
     }
 
+    let irTimerInterval = null;
+
     function closeModal() {
       const modal = document.getElementById('modal');
       if (!modal) return;
       modal.classList.remove('open');
       document.body.style.overflow = '';
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+
+      // Show inline results if there's an active unpaid session
+      if (currentSession) {
+        const section = document.getElementById('inline-results');
+        if (section && section.style.display === 'none') {
+          section.style.display = '';
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          // Start inline timer
+          if (!irTimerInterval) {
+            const end = Date.now() + 5 * 60 * 1000;
+            const timerEl = document.getElementById('ir-timer');
+            irTimerInterval = setInterval(() => {
+              const rem = Math.max(0, end - Date.now());
+              const mm  = String(Math.floor(rem / 60000)).padStart(2, '0');
+              const ss  = String(Math.floor((rem % 60000) / 1000)).padStart(2, '0');
+              if (timerEl) {
+                timerEl.textContent = `${mm}:${ss}`;
+                timerEl.classList.toggle('urgent', rem < 60000);
+              }
+              if (rem === 0) { clearInterval(irTimerInterval); irTimerInterval = null; }
+            }, 1000);
+          }
+        }
+      }
     }
 
     // Click on the overlay (not the card) closes the modal
@@ -3469,14 +3730,11 @@
     async function initiatePayment(tier) {
       if (!currentSession) return;
 
-      // Disable both buttons while processing
-      const btnInfome = document.getElementById('btn-informe');
-      const btnCv     = document.getElementById('btn-cv');
-      const targetBtn = tier === 'informe' ? btnInfome : btnCv;
-      if (targetBtn) {
-        targetBtn.disabled = true;
-        targetBtn.textContent = 'Cargando…';
-      }
+      // Disable buttons in both modal and inline section
+      ['btn-informe', 'btn-cv', 'ir-btn-informe', 'ir-btn-cv'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.disabled = true; el.textContent = 'Cargando…'; }
+      });
 
       try {
         const res = await fetch(`${API_URL}/api/payment/create`, {
@@ -3492,17 +3750,18 @@
         } else {
           alert(data.error || 'No se pudo iniciar el pago. Intentá de nuevo.');
           if (targetBtn) {
-            targetBtn.disabled = false;
-            targetBtn.textContent = tier === 'informe' ? 'Desbloquear informe' : 'Quiero mi CV nuevo';
-          }
+        ['btn-informe', 'btn-cv', 'ir-btn-informe', 'ir-btn-cv'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) { el.disabled = false; el.textContent = id.includes('informe') ? 'Desbloquear informe' : 'Quiero mi CV nuevo'; }
+        });
         }
       } catch (err) {
         console.error('[payment] Error:', err);
         alert('Error de conexión. Revisá tu internet e intentá de nuevo.');
-        if (targetBtn) {
-          targetBtn.disabled = false;
-          targetBtn.textContent = tier === 'informe' ? 'Desbloquear informe' : 'Quiero mi CV nuevo';
-        }
+        ['btn-informe', 'btn-cv', 'ir-btn-informe', 'ir-btn-cv'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) { el.disabled = false; el.textContent = id.includes('informe') ? 'Desbloquear informe' : 'Quiero mi CV nuevo'; }
+        });
       }
     }
 

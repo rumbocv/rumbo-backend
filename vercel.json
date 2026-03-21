@@ -7,8 +7,9 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/index.js" },
     { "src": "/health",   "dest": "/index.js" },
-    { "src": "/login",    "dest": "/public/login.html" },
-    { "src": "/admin",    "dest": "/public/admin.html" },
+    { "src": "/login",     "dest": "/public/login.html" },
+    { "src": "/admin",     "dest": "/public/admin.html" },
+    { "src": "/thank-you", "dest": "/public/thank-you.html" },
     { "src": "/(.*)",     "dest": "/public/$1" }
   ]
 }

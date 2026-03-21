@@ -10,7 +10,8 @@ const TTL_HOURS = 48;
 async function save(id, data, filename = null) {
   const record = { id, data };
   if (filename) record.filename = filename;
-  await supabase.from('sessions').insert(record);
+  const { error } = await supabase.from('sessions').insert(record);
+  if (error) console.error('[sessions/save] Error:', error.message, error.details);
 }
 
 async function get(id) {
@@ -33,4 +34,13 @@ async function markPaid(id, tier) {
   return !!data;
 }
 
-module.exports = { save, get, markPaid };
+async function saveContact(id, name, email) {
+  const { error } = await supabase
+    .from('sessions')
+    .update({ contact_name: name, contact_email: email })
+    .eq('id', id);
+  if (error) console.error('[sessions/saveContact] Error:', error.message);
+  return !error;
+}
+
+module.exports = { save, get, markPaid, saveContact };

@@ -7,6 +7,7 @@ const paymentRouter  = require('./routes/payment.js');
 const adminRouter    = require('./routes/admin.js');
 const { trackEvent }    = require('./services/events.js');
 const { sendMetaEvent } = require('./services/meta.js');
+const { saveContact }   = require('./services/sessions.js');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -41,6 +42,15 @@ app.post('/api/track/visit', async (req, res) => {
     console.error('[track/visit]', err.message);
     return res.status(500).json({ ok: false, error: 'Error al registrar visita.' });
   }
+});
+
+app.post('/api/contact', async (req, res) => {
+  const { sessionId, name, email } = req.body || {};
+  if (!sessionId || !name || !email) {
+    return res.status(400).json({ ok: false, error: 'sessionId, name y email son requeridos.' });
+  }
+  const ok = await saveContact(sessionId, name.trim(), email.trim().toLowerCase());
+  return res.json({ ok });
 });
 
 app.get('/health', (_req, res) => {

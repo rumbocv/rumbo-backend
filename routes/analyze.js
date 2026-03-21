@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const multer     = require('multer');
 const { v4: uuid } = require('uuid');
-const { analyzeCV }     = require('../services/claude.js');
+const { analyzeCV, checkIsCV } = require('../services/claude.js');
 const { save, get }     = require('../services/sessions.js');
 const { sendMetaEvent } = require('../services/meta.js');
 
@@ -32,6 +32,12 @@ router.post('/', upload.single('cv'), async (req, res) => {
 
   try {
     const puesto = (req.body?.puesto || '').trim() || null;
+
+    // Quick CV check — minimal tokens
+    const isCV = await checkIsCV(req.file.buffer, req.file.mimetype, req.file.originalname);
+    if (!isCV) {
+      return res.status(400).json({ ok: false, error: 'El archivo no parece ser un CV. Por favor subí tu currículum.' });
+    }
 
     // Fire Lead CAPI event on upload — before analysis starts
     sendMetaEvent('Lead', {

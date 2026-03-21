@@ -36,6 +36,41 @@ Reglas:
 - Respondé en español.`;
 }
 
+async function checkIsCV(fileBuffer, mimetype, originalname) {
+  const isPdf = mimetype === 'application/pdf' || originalname.toLowerCase().endsWith('.pdf');
+  try {
+    let message;
+    if (isPdf) {
+      message = await client.messages.create({
+        model:      'claude-haiku-4-5-20251001',
+        max_tokens: 5,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fileBuffer.toString('base64') } },
+            { type: 'text', text: '¿Es este documento un CV o currículum vitae? Responde únicamente SI o NO.' },
+          ],
+        }],
+      });
+    } else {
+      const result = await mammoth.extractRawText({ buffer: fileBuffer });
+      const text = (result.value || '').slice(0, 500);
+      message = await client.messages.create({
+        model:      'claude-haiku-4-5-20251001',
+        max_tokens: 5,
+        messages: [{
+          role: 'user',
+          content: `¿Es este documento un CV o currículum vitae? Responde únicamente SI o NO.\n\n${text}`,
+        }],
+      });
+    }
+    const answer = message.content[0]?.text?.trim().toUpperCase() ?? '';
+    return answer.startsWith('S');
+  } catch {
+    return true; // on error, allow through
+  }
+}
+
 async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
   const isPdf = mimetype === 'application/pdf' || originalname.toLowerCase().endsWith('.pdf');
   const prompt = buildPrompt(puesto);
@@ -87,4 +122,4 @@ async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
   }
 }
 
-module.exports = { analyzeCV };
+module.exports = { analyzeCV, checkIsCV };

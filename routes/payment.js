@@ -49,7 +49,7 @@ router.post('/create', async (req, res) => {
         }],
         external_reference: `${sessionId}|${tier}`,
         back_urls: {
-          success: `${frontendUrl}?payment=success&session=${sessionId}`,
+          success: `${frontendUrl}/thank-you?session=${sessionId}`,
           failure: `${frontendUrl}?payment=failure`,
           pending: `${frontendUrl}?payment=pending`,
         },
