@@ -3269,6 +3269,7 @@
 
         // Store session for payment
         currentSession = data.partial.sessionId;
+        localStorage.setItem('rumbo_session', JSON.stringify({ sessionId: data.partial.sessionId, partial: data.partial, ts: Date.now() }));
 
         // Show result state in dropzone
         stopLoadingAnimation();
@@ -3488,6 +3489,8 @@
 
         if (data.ok) {
           // Redirect to MercadoPago checkout
+          const saved = JSON.parse(localStorage.getItem('rumbo_session') || '{}');
+          localStorage.setItem('rumbo_session', JSON.stringify({ ...saved, tier }));
           window.location.href = data.checkoutUrl;
         } else {
           alert(data.error || 'No se pudo iniciar el pago. Intentá de nuevo.');
@@ -3507,6 +3510,25 @@
     }
 
     // -----------------------------------------------
+    // Restore session from localStorage (back from MP)
+    // -----------------------------------------------
+    (function restoreSession() {
+      const raw = localStorage.getItem('rumbo_session');
+      if (!raw) return;
+      try {
+        const saved = JSON.parse(raw);
+        const AGE_LIMIT = 48 * 60 * 60 * 1000;
+        if (!saved.sessionId || !saved.partial || (Date.now() - saved.ts) > AGE_LIMIT) {
+          localStorage.removeItem('rumbo_session');
+          return;
+        }
+        currentSession = saved.sessionId;
+        // Re-open modal with saved partial data
+        setTimeout(() => openModal(saved.partial), 300);
+      } catch { localStorage.removeItem('rumbo_session'); }
+    })();
+
+    // -----------------------------------------------
     // Post-payment: handle ?payment=success&session=X
     // Called on page load if redirected back from MP
     // -----------------------------------------------
@@ -3517,9 +3539,9 @@
 
       if (status !== 'success' || !sessionId) return;
 
-      // Clean up the URL without reloading the page
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, '', cleanUrl);
+      // Clean up URL and localStorage
+      window.history.replaceState({}, '', window.location.pathname);
+      localStorage.removeItem('rumbo_session');
 
       try {
         const res  = await fetch(`${API_URL}/api/analyze/unlock/${sessionId}`);
