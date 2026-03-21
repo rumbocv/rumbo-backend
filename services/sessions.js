@@ -35,12 +35,24 @@ async function markPaid(id, tier) {
 }
 
 async function saveContact(id, name, email) {
+  // Get next order number (max + 1, starting at 205)
+  const { data: maxRow } = await supabase
+    .from('sessions')
+    .select('order_number')
+    .not('order_number', 'is', null)
+    .order('order_number', { ascending: false })
+    .limit(1)
+    .single();
+
+  const orderNumber = maxRow?.order_number ? maxRow.order_number + 1 : 205;
+
   const { error } = await supabase
     .from('sessions')
-    .update({ contact_name: name, contact_email: email })
+    .update({ contact_name: name, contact_email: email, order_number: orderNumber })
     .eq('id', id);
+
   if (error) console.error('[sessions/saveContact] Error:', error.message);
-  return !error;
+  return error ? null : orderNumber;
 }
 
 module.exports = { save, get, markPaid, saveContact };

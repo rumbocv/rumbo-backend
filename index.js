@@ -49,8 +49,8 @@ app.post('/api/contact', async (req, res) => {
   if (!sessionId || !name || !email) {
     return res.status(400).json({ ok: false, error: 'sessionId, name y email son requeridos.' });
   }
-  const ok = await saveContact(sessionId, name.trim(), email.trim().toLowerCase());
-  return res.json({ ok });
+  const orderNumber = await saveContact(sessionId, name.trim(), email.trim().toLowerCase());
+  return res.json({ ok: orderNumber !== null, orderNumber });
 });
 
 app.get('/health', (_req, res) => {

@@ -3,15 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>¡Pago confirmado! — Rumbo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>¡Listo! — Rumbo</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-font-smoothing: antialiased; }
+
+    @keyframes popIn {
+      0%   { transform: scale(0); opacity: 0; }
+      70%  { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    @keyframes ripple {
+      0%   { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+    @keyframes fadeUp {
+      0%   { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0%   { left: -60%; }
+      100% { left: 130%; }
+    }
+
     body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: #0A1628;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0d1b2a;
       color: #fff;
       min-height: 100vh;
       display: flex;
@@ -19,92 +36,228 @@
       justify-content: center;
       padding: 2rem 1rem;
     }
+
     .card {
-      background: #0F1E35;
-      border: 1.5px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 2.5rem 2rem;
+      background: #112236;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 3rem 2.25rem 2.5rem;
       width: 100%;
-      max-width: 480px;
+      max-width: 460px;
       text-align: center;
     }
-    .icon {
-      width: 56px;
-      height: 56px;
-      background: rgba(0,210,106,0.12);
+
+    /* — Icon — */
+    .icon-wrap {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 1.75rem;
+    }
+    .icon-ripple {
+      position: absolute;
+      inset: 0;
       border-radius: 50%;
+      background: rgba(0, 255, 106, 0.25);
+      animation: ripple 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+    }
+    .icon-circle {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: rgba(0, 255, 106, 0.14);
+      border: 2px solid rgba(0, 255, 106, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 1.25rem;
-      font-size: 1.5rem;
+      animation: popIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
+    .icon-circle svg {
+      width: 30px;
+      height: 30px;
+      stroke: #00ff6a;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* — Copy — */
     h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
+      font-size: clamp(1.25rem, 4vw, 1.5rem);
+      font-weight: 800;
+      line-height: 1.25;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.2s forwards;
     }
     .subtitle {
       font-size: 0.9375rem;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 2rem;
-      line-height: 1.5;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.6;
+      margin-bottom: 0.625rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.3s forwards;
     }
-    .subtitle strong { color: #00D26A; }
-    form { display: flex; flex-direction: column; gap: 1rem; text-align: left; }
-    label { font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.75); margin-bottom: 0.25rem; display: block; }
+    .green-line {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #00ff6a;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.4s forwards;
+    }
+
+    /* — Order badge — */
+    .order-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.375rem 0.875rem;
+      font-size: 0.8125rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 1.75rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.45s forwards;
+    }
+    .order-badge span { color: rgba(255,255,255,0.75); font-weight: 600; }
+
+    /* — Form — */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: left;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.5s forwards;
+    }
+    label {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 0.3rem;
+      display: block;
+    }
     input {
       width: 100%;
-      padding: 0.75rem 1rem;
-      background: rgba(255,255,255,0.05);
-      border: 1.5px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
+      padding: 0.8125rem 1rem;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
       color: #fff;
       font-size: 1rem;
       font-family: inherit;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus { border-color: #00D26A; }
-    input::placeholder { color: rgba(255,255,255,0.3); }
-    button[type="submit"] {
-      background: #00D26A;
-      color: #0A1628;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 0.875rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: opacity 0.2s;
-      margin-top: 0.5rem;
+    input:focus {
+      border-color: #00ff6a;
+      box-shadow: 0 0 0 3px rgba(0, 255, 106, 0.12);
     }
-    button[type="submit"]:hover { opacity: 0.88; }
-    button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
-    .success-msg {
-      display: none;
-      background: rgba(0,210,106,0.1);
-      border: 1px solid rgba(0,210,106,0.25);
+    input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* — Button — */
+    .btn-wrap {
+      position: relative;
+      overflow: hidden;
       border-radius: 10px;
-      padding: 1.25rem;
-      font-size: 0.9375rem;
-      line-height: 1.6;
-      color: rgba(255,255,255,0.85);
+      margin-top: 0.25rem;
     }
-    .success-msg strong { color: #00D26A; display: block; margin-bottom: 0.25rem; font-size: 1rem; }
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.9375rem;
+      background: #00d26a;
+      color: #0a1628;
+      font-weight: 800;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.15s;
+      font-family: inherit;
+    }
+    button[type="submit"]:hover { opacity: 0.9; transform: translateY(-1px); }
+    button[type="submit"]:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    button[type="submit"]::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -60%;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+      animation: shimmer 3s ease-in-out 1.5s infinite;
+    }
+    button[type="submit"]:disabled::after { display: none; }
+
+    /* — Error — */
     .error-msg {
-      color: #FF6B6B;
-      font-size: 0.875rem;
+      color: #ff6b6b;
+      font-size: 0.8125rem;
       text-align: center;
       display: none;
     }
+
+    /* — Success state — */
+    .success-msg {
+      display: none;
+      text-align: center;
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .success-msg .success-title {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: #00ff6a;
+      margin-bottom: 0.5rem;
+    }
+    .success-msg p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.6;
+    }
+    .success-msg .email-shown {
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+    }
+
+    /* — Footer — */
+    .footer-note {
+      margin-top: 1.75rem;
+      font-size: 0.8125rem;
+      color: rgba(255,255,255,0.3);
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.6s forwards;
+    }
+    .footer-note a {
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .footer-note a:hover { color: #00ff6a; }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="icon">✓</div>
-    <h1>¡Pago confirmado!</h1>
-    <p class="subtitle">Dejanos tu nombre y email para enviarte el informe.<br><strong>Lo tenés en menos de 24 horas.</strong></p>
+    <div class="icon-wrap">
+      <div class="icon-ripple"></div>
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+
+    <h1>¡Listo. Tomaste la mejor decisión para tu carrera.</h1>
+    <p class="subtitle">En menos de 24 horas tenés en tu bandeja el informe completo de tu CV.</p>
+    <p class="green-line">Revisá el email — llega antes de que te des cuenta.</p>
+
+    <div class="order-badge" id="order-badge" style="display:none">
+      Pedido <span id="order-number"></span>
+    </div>
 
     <form id="contact-form">
       <div>
@@ -116,24 +269,28 @@
         <input type="email" id="email" name="email" placeholder="tu@email.com" required autocomplete="email">
       </div>
       <p class="error-msg" id="error-msg"></p>
-      <button type="submit" id="submit-btn">Enviar y recibir mi informe</button>
+      <div class="btn-wrap">
+        <button type="submit" id="submit-btn">Quiero recibir mi informe →</button>
+      </div>
     </form>
 
     <div class="success-msg" id="success-msg">
-      <strong>¡Listo! Te escribimos pronto.</strong>
-      Vas a recibir tu informe completo en <strong>menos de 24 horas</strong> en <span id="email-display"></span>. Revisá también tu carpeta de spam.
+      <div class="success-title">¡Ya está en camino!</div>
+      <p>Te mandamos el informe a <span class="email-shown" id="email-display"></span>.<br>Revisá también el spam por las dudas.</p>
     </div>
+
+    <p class="footer-note">
+      ¿Alguna duda? Escribinos a
+      <a href="https://instagram.com/rumbo.cv" target="_blank" rel="noopener">@rumbo.cv</a>
+    </p>
   </div>
 
   <script>
-    const API_URL = 'https://rumbo-six.vercel.app';
+    const API_URL   = 'https://rumbo-six.vercel.app';
     const params    = new URLSearchParams(window.location.search);
     const sessionId = params.get('session');
 
-    // Guard: redirect to landing if no session
-    if (!sessionId) {
-      window.location.replace('/');
-    }
+    if (!sessionId) window.location.replace('/');
 
     document.getElementById('contact-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -144,7 +301,7 @@
 
       if (!name || !email) return;
 
-      btn.disabled = true;
+      btn.disabled    = true;
       btn.textContent = 'Enviando…';
       errEl.style.display = 'none';
 
@@ -157,17 +314,22 @@
         const data = await res.json();
 
         if (data.ok) {
-          document.getElementById('contact-form').style.display = 'none';
-          document.getElementById('email-display').textContent = email;
-          document.getElementById('success-msg').style.display = 'block';
+          document.getElementById('contact-form').style.display  = 'none';
+          document.getElementById('email-display').textContent   = email;
+          document.getElementById('success-msg').style.display   = 'block';
+
+          if (data.orderNumber) {
+            document.getElementById('order-number').textContent = `#${data.orderNumber}`;
+            document.getElementById('order-badge').style.display = 'inline-block';
+          }
         } else {
           throw new Error(data.error || 'Error al guardar.');
         }
-      } catch (err) {
-        errEl.textContent = 'Hubo un error. Intentá de nuevo.';
+      } catch {
+        errEl.textContent   = 'Hubo un error. Intentá de nuevo.';
         errEl.style.display = 'block';
-        btn.disabled = false;
-        btn.textContent = 'Enviar y recibir mi informe';
+        btn.disabled        = false;
+        btn.textContent     = 'Quiero recibir mi informe →';
       }
     });
   </script>
