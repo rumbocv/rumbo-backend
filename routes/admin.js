@@ -41,27 +41,64 @@ router.get('/config', (_req, res) => {
   });
 });
 
-// GET /api/admin/stats — event counts by type from last 30 days
+// GET /api/admin/stats — event counts + conversion rates + timeseries
 router.get('/stats', requireAdmin, async (_req, res) => {
   try {
     const since = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
 
     const { data, error } = await supabase
       .from('events')
-      .select('type')
-      .gte('created_at', since);
+      .select('type, created_at')
+      .gte('created_at', since)
+      .order('created_at', { ascending: true });
 
     if (error) throw error;
 
     const counts = { visit: 0, checkout: 0, purchase: 0 };
+    const daily  = {};
+
     (data || []).forEach(row => {
       if (counts[row.type] !== undefined) counts[row.type]++;
+      if (row.type === 'visit') {
+        const day = row.created_at.slice(0, 10);
+        daily[day] = (daily[day] || 0) + 1;
+      }
     });
 
-    return res.json({ ok: true, stats: counts });
+    // Fill last 30 days (including zeros)
+    const timeseries = [];
+    for (let i = 29; i >= 0; i--) {
+      const d   = new Date(Date.now() - i * 86400000);
+      const key = d.toISOString().slice(0, 10);
+      timeseries.push({ date: key, visits: daily[key] || 0 });
+    }
+
+    // Conversion rates
+    const cr_checkout = counts.visit > 0 ? ((counts.checkout / counts.visit) * 100).toFixed(1) : '0.0';
+    const cr_purchase = counts.visit > 0 ? ((counts.purchase / counts.visit) * 100).toFixed(1) : '0.0';
+
+    return res.json({ ok: true, stats: counts, timeseries, conversions: { cr_checkout, cr_purchase } });
   } catch (err) {
     console.error('[admin/stats]', err.message);
     return res.status(500).json({ ok: false, error: 'Error al obtener estadísticas.' });
+  }
+});
+
+// GET /api/admin/active — visitors in the last 5 minutes
+router.get('/active', requireAdmin, async (_req, res) => {
+  try {
+    const since = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { count, error } = await supabase
+      .from('events')
+      .select('*', { count: 'exact', head: true })
+      .eq('type', 'visit')
+      .gte('created_at', since);
+
+    if (error) throw error;
+    return res.json({ ok: true, active: count || 0 });
+  } catch (err) {
+    console.error('[admin/active]', err.message);
+    return res.status(500).json({ ok: false, active: 0 });
   }
 });
 

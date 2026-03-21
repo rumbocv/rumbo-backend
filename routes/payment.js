@@ -3,6 +3,7 @@ const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 const { get, markPaid }   = require('../services/sessions.js');
 const { sendMetaEvent }   = require('../services/meta.js');
 const { trackEvent }      = require('../services/events.js');
+const { sendTelegram }    = require('../services/telegram.js');
 
 const router   = Router();
 const mpClient = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN || '' });
@@ -82,6 +83,10 @@ router.post('/webhook', async (req, res) => {
 
     const updated = await markPaid(sessionId, tier);
     if (updated) {
+      const amount = TIERS[tier]?.unit_price ?? 0;
+      const label  = tier === 'cv' ? 'CV Listo Para Enviar' : 'Solo el Informe';
+      sendTelegram(`💰 <b>Nueva venta!</b>\n\n📦 Plan: ${label}\n💵 Monto: $${amount.toLocaleString('es-AR')} ARS\n🆔 Pago: ${paymentId}`).catch(() => {});
+
       await Promise.all([
         trackEvent('purchase', { tier, amount: TIERS[tier]?.unit_price }).catch(err =>
           console.error('[trackEvent/purchase]', err.message)

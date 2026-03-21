@@ -6,377 +6,302 @@
   <title>Rumbo — Admin</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f6f9; color: #0f1f3d; min-height: 100vh; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f9fafb;
-      color: #0f1f3d;
-      min-height: 100vh;
-    }
+    header { background: #0f1f3d; color: #fff; padding: 0 28px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+    .brand span { color: #22c55e; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .active-pill { display: flex; align-items: center; gap: 6px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; color: #22c55e; }
+    .active-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    header button { background: transparent; border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    header button:hover { background: rgba(255,255,255,0.1); }
 
-    header {
-      background: #0f1f3d;
-      color: #ffffff;
-      padding: 0 24px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    main { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
 
-    header .brand {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-    }
+    /* Stats row */
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin-bottom: 8px; }
+    .stat-value { font-size: 32px; font-weight: 800; line-height: 1; color: #0f1f3d; }
+    .stat-value.green { color: #16a34a; }
+    .stat-sub { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+    .stat-conversion { font-size: 18px; font-weight: 800; color: #6366f1; }
 
-    header .brand span {
-      color: #22c55e;
-    }
-
-    header button {
-      background: transparent;
-      border: 1.5px solid rgba(255,255,255,0.35);
-      color: #ffffff;
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    header button:hover {
-      background: rgba(255,255,255,0.12);
-    }
-
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 32px 24px;
-    }
-
-    h2 {
-      font-size: 17px;
-      font-weight: 700;
-      color: #0f1f3d;
-      margin-bottom: 16px;
-    }
-
-    /* Stats */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 36px;
-    }
-
-    .stat-card {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 22px 24px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-      border: 1px solid #e5e7eb;
-    }
-
-    .stat-card .label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #6b7280;
-      margin-bottom: 8px;
-    }
-
-    .stat-card .value {
-      font-size: 36px;
-      font-weight: 800;
-      color: #0f1f3d;
-      line-height: 1;
-    }
-
-    .stat-card.green .value  { color: #16a34a; }
-    .stat-card.navy  .value  { color: #0f1f3d; }
+    /* Chart */
+    .chart-card { background: #fff; border-radius: 12px; padding: 24px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
+    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .chart-title { font-size: 15px; font-weight: 700; color: #0f1f3d; }
+    .chart-sub { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+    canvas { width: 100%; display: block; }
 
     /* Table */
-    .table-section {
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-      border: 1px solid #e5e7eb;
-      overflow: hidden;
-    }
+    .table-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+    .table-header { padding: 18px 24px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; }
+    .table-title { font-size: 15px; font-weight: 700; }
+    .table-count { font-size: 12px; color: #9ca3af; background: #f3f4f6; padding: 3px 10px; border-radius: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead tr { background: #f9fafb; }
+    th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; }
+    td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; color: #111827; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
 
-    .table-section .table-header {
-      padding: 18px 24px;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .badge.paid { background: #dcfce7; color: #15803d; }
+    .badge.free { background: #f3f4f6; color: #9ca3af; }
 
-    .table-section .table-header h2 {
-      margin: 0;
-    }
+    .score-wrap { display: flex; align-items: center; gap: 8px; }
+    .score-bar { flex: 1; height: 5px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+    .score-fill { height: 100%; border-radius: 99px; background: #22c55e; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
+    .empty { text-align: center; padding: 48px; color: #9ca3af; font-size: 14px; }
+    .loading { text-align: center; padding: 32px; color: #9ca3af; font-size: 14px; }
 
-    thead tr {
-      background: #f3f4f6;
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-grid .stat-card:last-child { grid-column: 1 / -1; }
     }
-
-    th {
-      text-align: left;
-      padding: 10px 16px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #6b7280;
-    }
-
-    td {
-      padding: 12px 16px;
-      border-bottom: 1px solid #f3f4f6;
-      color: #111827;
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    tr:hover td {
-      background: #f9fafb;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 99px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .badge.paid {
-      background: #dcfce7;
-      color: #15803d;
-    }
-
-    .badge.free {
-      background: #f3f4f6;
-      color: #6b7280;
-    }
-
-    .score-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .score-bar .bar {
-      flex: 1;
-      height: 6px;
-      background: #e5e7eb;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .score-bar .fill {
-      height: 100%;
-      border-radius: 99px;
-      background: #22c55e;
-    }
-
-    .nivel-tag {
-      font-size: 12px;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: #9ca3af;
-      font-size: 14px;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 32px;
-      color: #9ca3af;
-      font-size: 14px;
-    }
-
-    @media (max-width: 640px) {
-      .stats-row { grid-template-columns: 1fr; }
-      th, td { padding: 10px 12px; }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">Rumbo<span>.</span> Admin</div>
-    <button id="logoutBtn">Cerrar sesión</button>
-  </header>
+<header>
+  <div class="brand">Rumbo<span>.</span></div>
+  <div class="header-right">
+    <div class="active-pill">
+      <div class="active-dot"></div>
+      <span id="activeCount">—</span> en vivo
+    </div>
+    <button id="logoutBtn">Salir</button>
+  </div>
+</header>
 
-  <main>
-    <div class="stats-row">
-      <div class="stat-card navy">
-        <div class="label">Visitas (30 días)</div>
-        <div class="value" id="statVisit">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Checkouts (30 días)</div>
-        <div class="value" id="statCheckout">—</div>
-      </div>
-      <div class="stat-card green">
-        <div class="label">Compras (30 días)</div>
-        <div class="value" id="statPurchase">—</div>
+<main>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Visitas (30d)</div>
+      <div class="stat-value" id="statVisit">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Checkouts (30d)</div>
+      <div class="stat-value" id="statCheckout">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Compras (30d)</div>
+      <div class="stat-value green" id="statPurchase">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Conv. Checkout</div>
+      <div class="stat-conversion" id="statCrCheckout">—</div>
+      <div class="stat-sub">visitas → checkout</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Conv. Compra</div>
+      <div class="stat-conversion" id="statCrPurchase">—</div>
+      <div class="stat-sub">visitas → compra</div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Visitas diarias</div>
+        <div class="chart-sub">Últimos 30 días</div>
       </div>
     </div>
+    <canvas id="visitChart" height="180"></canvas>
+  </div>
 
-    <div class="table-section">
-      <div class="table-header">
-        <h2>CVs analizados</h2>
-      </div>
-      <div id="tableContainer">
-        <div class="loading">Cargando...</div>
-      </div>
+  <!-- CVs table -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">CVs analizados</div>
+      <div class="table-count" id="cvsCount">—</div>
     </div>
-  </main>
+    <div id="tableContainer"><div class="loading">Cargando...</div></div>
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script>
-    const ADMIN_EMAIL = 'ramiro.suarezf@gmail.com';
-    let supabaseClient = null;
-    let accessToken    = null;
+</main>
 
-    async function initSupabase() {
-      const res = await fetch('/api/admin/config');
-      const { supabaseUrl, supabaseAnonKey } = await res.json();
-      supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const ADMIN_EMAIL = 'ramiro.suarezf@gmail.com';
+  let supabaseClient = null;
+  let accessToken    = null;
 
-    async function checkAuth() {
-      // Try to restore session from localStorage
-      const stored = localStorage.getItem('rumbo_admin_session');
-      if (!stored) return redirect();
+  async function initSupabase() {
+    const res = await fetch('/api/admin/config');
+    const { supabaseUrl, supabaseAnonKey } = await res.json();
+    supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+  }
 
-      let session;
-      try { session = JSON.parse(stored); } catch { return redirect(); }
+  async function checkAuth() {
+    const stored = localStorage.getItem('rumbo_admin_session');
+    if (!stored) return redirect();
+    let session;
+    try { session = JSON.parse(stored); } catch { return redirect(); }
+    const { data, error } = await supabaseClient.auth.setSession({
+      access_token: session.access_token, refresh_token: session.refresh_token,
+    });
+    if (error || !data.session) return redirect();
+    if (data.session.user.email !== ADMIN_EMAIL) return redirect();
+    accessToken = data.session.access_token;
+    localStorage.setItem('rumbo_admin_session', JSON.stringify(data.session));
+  }
 
-      // Refresh session via Supabase
-      const { data, error } = await supabaseClient.auth.setSession({
-        access_token:  session.access_token,
-        refresh_token: session.refresh_token,
-      });
+  function redirect() {
+    localStorage.removeItem('rumbo_admin_session');
+    window.location.href = '/login';
+  }
 
-      if (error || !data.session) return redirect();
-      if (data.session.user.email !== ADMIN_EMAIL) return redirect();
+  async function authFetch(url) {
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+    return res.json();
+  }
 
-      accessToken = data.session.access_token;
-      localStorage.setItem('rumbo_admin_session', JSON.stringify(data.session));
-    }
+  // ---- Chart ----
+  function drawChart(timeseries) {
+    const canvas = document.getElementById('visitChart');
+    const dpr    = window.devicePixelRatio || 1;
+    const W      = canvas.parentElement.clientWidth - 48;
+    const H      = 180;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
 
-    function redirect() {
-      localStorage.removeItem('rumbo_admin_session');
-      window.location.href = '/login';
-    }
+    const vals   = timeseries.map(d => d.visits);
+    const maxVal = Math.max(...vals, 1);
+    const n      = timeseries.length;
+    const padL   = 36, padR = 8, padT = 12, padB = 32;
+    const chartW = W - padL - padR;
+    const chartH = H - padT - padB;
+    const barW   = Math.max(2, (chartW / n) * 0.6);
+    const gap    = chartW / n;
 
-    async function authFetch(url) {
-      const res = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${accessToken}` },
-      });
-      return res.json();
-    }
-
-    async function loadStats() {
-      try {
-        const { stats } = await authFetch('/api/admin/stats');
-        if (!stats) return;
-        document.getElementById('statVisit').textContent    = stats.visit    ?? 0;
-        document.getElementById('statCheckout').textContent = stats.checkout ?? 0;
-        document.getElementById('statPurchase').textContent = stats.purchase ?? 0;
-      } catch (err) {
-        console.error('[stats]', err);
-      }
-    }
-
-    async function loadCVs() {
-      const container = document.getElementById('tableContainer');
-      try {
-        const { cvs } = await authFetch('/api/admin/cvs');
-
-        if (!cvs || cvs.length === 0) {
-          container.innerHTML = '<div class="empty-state">No hay CVs registrados aún.</div>';
-          return;
-        }
-
-        const rows = cvs.map(cv => {
-          const date     = cv.created_at ? new Date(cv.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
-          const score    = cv.score != null ? cv.score : null;
-          const scoreBar = score != null
-            ? `<div class="score-bar"><span style="min-width:30px">${score}</span><div class="bar"><div class="fill" style="width:${score}%"></div></div></div>`
-            : '—';
-          const nivel    = cv.nivel ? `<span class="nivel-tag">${cv.nivel}</span>` : '—';
-          const estado   = cv.paid
-            ? '<span class="badge paid">Pago</span>'
-            : '<span class="badge free">Gratis</span>';
-          const plan     = cv.tier || '—';
-          const archivo  = cv.filename || '—';
-
-          return `<tr>
-            <td>${date}</td>
-            <td>${scoreBar}</td>
-            <td>${nivel}</td>
-            <td>${estado}</td>
-            <td>${plan}</td>
-            <td style="color:#6b7280;font-size:12px">${archivo}</td>
-          </tr>`;
-        }).join('');
-
-        container.innerHTML = `
-          <table>
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Score</th>
-                <th>Nivel</th>
-                <th>Estado</th>
-                <th>Plan</th>
-                <th>Archivo</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        `;
-      } catch (err) {
-        console.error('[cvs]', err);
-        container.innerHTML = '<div class="empty-state">Error al cargar los datos.</div>';
-      }
-    }
-
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      await supabaseClient.auth.signOut();
-      localStorage.removeItem('rumbo_admin_session');
-      window.location.href = '/login';
+    // Grid lines
+    ctx.strokeStyle = '#f3f4f6';
+    ctx.lineWidth   = 1;
+    [0, 0.25, 0.5, 0.75, 1].forEach(f => {
+      const y = padT + chartH * (1 - f);
+      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
     });
 
-    (async () => {
-      try {
-        await initSupabase();
-        await checkAuth();
-        await Promise.all([loadStats(), loadCVs()]);
-      } catch (err) {
-        console.error('[admin init]', err);
-        redirect();
-      }
-    })();
-  </script>
+    // Y labels
+    ctx.fillStyle  = '#9ca3af';
+    ctx.font       = '10px system-ui';
+    ctx.textAlign  = 'right';
+    [0, Math.round(maxVal / 2), maxVal].forEach((v, i) => {
+      const y = padT + chartH * (1 - v / maxVal);
+      ctx.fillText(v, padL - 4, y + 3);
+    });
+
+    // Bars
+    timeseries.forEach((d, i) => {
+      const x    = padL + i * gap + (gap - barW) / 2;
+      const barH = (d.visits / maxVal) * chartH;
+      const y    = padT + chartH - barH;
+      const grad = ctx.createLinearGradient(0, y, 0, y + barH);
+      grad.addColorStop(0, '#22c55e');
+      grad.addColorStop(1, '#86efac');
+      ctx.fillStyle = grad;
+      const r = Math.min(3, barW / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + barW - r, y);
+      ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+      ctx.lineTo(x + barW, y + barH);
+      ctx.lineTo(x, y + barH);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+      ctx.fill();
+    });
+
+    // X labels (every 5 days)
+    ctx.fillStyle = '#9ca3af';
+    ctx.textAlign = 'center';
+    ctx.font      = '10px system-ui';
+    timeseries.forEach((d, i) => {
+      if (i % 5 !== 0 && i !== n - 1) return;
+      const x = padL + i * gap + gap / 2;
+      const label = d.date.slice(5).replace('-', '/');
+      ctx.fillText(label, x, H - 6);
+    });
+  }
+
+  // ---- Stats ----
+  async function loadStats() {
+    const { stats, timeseries, conversions } = await authFetch('/api/admin/stats');
+    if (!stats) return;
+    document.getElementById('statVisit').textContent    = stats.visit    ?? 0;
+    document.getElementById('statCheckout').textContent = stats.checkout ?? 0;
+    document.getElementById('statPurchase').textContent = stats.purchase ?? 0;
+    document.getElementById('statCrCheckout').textContent = (conversions?.cr_checkout ?? '0.0') + '%';
+    document.getElementById('statCrPurchase').textContent = (conversions?.cr_purchase ?? '0.0') + '%';
+    if (timeseries) drawChart(timeseries);
+  }
+
+  // ---- Active visitors ----
+  async function loadActive() {
+    try {
+      const { active } = await authFetch('/api/admin/active');
+      document.getElementById('activeCount').textContent = active ?? 0;
+    } catch {}
+  }
+
+  // ---- CVs table ----
+  async function loadCVs() {
+    const container = document.getElementById('tableContainer');
+    const { cvs } = await authFetch('/api/admin/cvs');
+    if (!cvs || cvs.length === 0) {
+      container.innerHTML = '<div class="empty">No hay CVs registrados aún.</div>';
+      return;
+    }
+    document.getElementById('cvsCount').textContent = cvs.length;
+    const rows = cvs.map(cv => {
+      const date   = cv.created_at ? new Date(cv.created_at).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
+      const score  = cv.score != null ? `<div class="score-wrap"><span style="min-width:26px;font-size:12px">${cv.score}</span><div class="score-bar"><div class="score-fill" style="width:${cv.score}%"></div></div></div>` : '—';
+      const nivel  = cv.nivel || '—';
+      const estado = cv.paid ? '<span class="badge paid">Pago</span>' : '<span class="badge free">Gratis</span>';
+      const plan   = cv.tier ? `<span style="font-size:12px;font-weight:600;color:#6366f1">${cv.tier}</span>` : '—';
+      const file   = cv.filename ? `<span style="font-size:11px;color:#9ca3af">${cv.filename}</span>` : '—';
+      return `<tr><td>${date}</td><td>${score}</td><td style="font-size:12px">${nivel}</td><td>${estado}</td><td>${plan}</td><td>${file}</td></tr>`;
+    }).join('');
+    container.innerHTML = `<table>
+      <thead><tr><th>Fecha</th><th>Score</th><th>Nivel</th><th>Estado</th><th>Plan</th><th>Archivo</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    localStorage.removeItem('rumbo_admin_session');
+    window.location.href = '/login';
+  });
+
+  (async () => {
+    try {
+      await initSupabase();
+      await checkAuth();
+      await Promise.all([loadStats(), loadCVs(), loadActive()]);
+      // Refresh active visitors every 30s
+      setInterval(loadActive, 30000);
+    } catch (err) {
+      console.error('[admin init]', err);
+      redirect();
+    }
+  })();
+</script>
 </body>
 </html>
