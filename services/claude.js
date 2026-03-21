@@ -79,8 +79,9 @@ async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
 
   if (isPdf) {
     message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1200,
+      model:       'claude-haiku-4-5-20251001',
+      max_tokens:  1200,
+      temperature: 0,
       messages: [{
         role: 'user',
         content: [
@@ -103,8 +104,9 @@ async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
     }
 
     message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1200,
+      model:       'claude-haiku-4-5-20251001',
+      max_tokens:  1200,
+      temperature: 0,
       messages: [{
         role: 'user',
         content: `${prompt}\n\n---CV---\n${extractedText.slice(0, 3000)}`,
