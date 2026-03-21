@@ -55,6 +55,7 @@ router.post('/create', async (req, res) => {
         },
         auto_return:      'approved',
         notification_url: `${apiUrl}/api/payment/webhook`,
+        payer: { email: 'test_user_buyer@testuser.com' },
       },
     });
     return res.json({ ok: true, checkoutUrl: result.init_point });
