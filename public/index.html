@@ -3253,6 +3253,10 @@
       startLoadingAnimation();
 
       try {
+        // Fire Lead on upload — before analysis starts
+        fbq('track', 'Lead');
+        console.log('%c[Pixel] Lead fired', 'color: #1877F2; font-weight: bold');
+
         const formData = new FormData();
         formData.append('cv', file);
         if (puesto) formData.append('puesto', puesto);

@@ -31,7 +31,19 @@ router.post('/', upload.single('cv'), async (req, res) => {
   }
 
   try {
-    const puesto   = (req.body?.puesto || '').trim() || null;
+    const puesto = (req.body?.puesto || '').trim() || null;
+
+    // Fire Lead CAPI event on upload — before analysis starts
+    sendMetaEvent('Lead', {
+      ip:         req.ip,
+      userAgent:  req.headers['user-agent'],
+      fbp:        req.cookies?.['_fbp'],
+      fbc:        req.cookies?.['_fbc'],
+      url:        req.headers['referer'] || process.env.FRONTEND_URL,
+      eventId:    `lead_${req.ip}_${Date.now()}`,
+      customData: { content_name: 'diagnostico_cv', value: 0, currency: 'ARS' },
+    }).catch(err => console.error('[meta/lead]', err.message));
+
     const analysis = await analyzeCV(req.file.buffer, req.file.mimetype, req.file.originalname, puesto);
 
     if (Array.isArray(analysis.categorias)) {
@@ -58,16 +70,6 @@ router.post('/', upload.single('cv'), async (req, res) => {
       errores_preview:    Array.isArray(analysis.errores) ? analysis.errores.slice(0, 3) : [],
       keywords_faltantes: Array.isArray(analysis.keywords_faltantes) ? analysis.keywords_faltantes : [],
     };
-
-    await sendMetaEvent('Lead', {
-      ip:         req.ip,
-      userAgent:  req.headers['user-agent'],
-      fbp:        req.cookies?.['_fbp'],
-      fbc:        req.cookies?.['_fbc'],
-      url:        req.headers['referer'] || process.env.FRONTEND_URL,
-      eventId:    `lead_${sessionId}`,
-      customData: { content_name: 'diagnostico_cv', value: 0, currency: 'ARS' },
-    });
 
     return res.json({ ok: true, partial });
 
