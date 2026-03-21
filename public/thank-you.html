@@ -127,8 +127,13 @@
 
   <script>
     const API_URL = 'https://rumbo-six.vercel.app';
-    const params  = new URLSearchParams(window.location.search);
+    const params    = new URLSearchParams(window.location.search);
     const sessionId = params.get('session');
+
+    // Guard: redirect to landing if no session
+    if (!sessionId) {
+      window.location.replace('/');
+    }
 
     document.getElementById('contact-form').addEventListener('submit', async (e) => {
       e.preventDefault();
