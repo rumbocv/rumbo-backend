@@ -5,7 +5,6 @@ const { sendPurchaseConfirmation, syncUnpaidLeads } = require('../services/brevo
 const { sendTelegram }  = require('../services/telegram.js');
 const { sendMetaEvent } = require('../services/meta.js');
 const { optimizeCV }    = require('../services/claude.js');
-const { generateCvDocx } = require('../services/cvDocx.js');
 
 const router = Router();
 
@@ -523,28 +522,6 @@ router.get('/cvs/:sessionId/optimization', requireAdmin, async (req, res) => {
   }
 });
 
-// GET /api/admin/cvs/:sessionId/optimization/download-docx — download CV optimizado as DOCX
-router.get('/cvs/:sessionId/optimization/download-docx', requireAdmin, async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('cv_optimizations')
-      .select('cv_optimized')
-      .eq('session_id', req.params.sessionId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (error || !data) return res.status(404).json({ ok: false, error: 'No hay optimización guardada.' });
-
-    const buffer = await generateCvDocx(data.cv_optimized);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    res.setHeader('Content-Disposition', 'attachment; filename="cv_optimizado.docx"');
-    res.send(buffer);
-  } catch (err) {
-    console.error('[admin/optimization/download-docx]', err.message);
-    res.status(500).json({ ok: false, error: 'Error al generar el DOCX.' });
-  }
-});
 
 // GET /api/admin/locations — visitas agrupadas por ciudad para el rango seleccionado
 router.get('/locations', requireAdmin, async (req, res) => {
