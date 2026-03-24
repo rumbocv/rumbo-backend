@@ -230,6 +230,12 @@ async function optimizeCV(cvBuffer, mimetype, originalname, jd, market = null) {
 
   const raw = message.content[0]?.text ?? '';
 
+  console.log('[optimize] stop_reason:', message.stop_reason);
+  console.log('[optimize] output_tokens:', message.usage?.output_tokens);
+  console.log('[optimize] raw[0:500]:', JSON.stringify(raw.slice(0, 500)));
+  console.log('[optimize] has ###CV_HTML###:', raw.includes('###CV_HTML###'));
+  console.log('[optimize] has ###INFORME_HTML###:', raw.includes('###INFORME_HTML###'));
+
   // Split on ###INFORME_HTML### delimiter
   const splitIdx = raw.indexOf('###INFORME_HTML###');
   const cvOptimized = splitIdx > 0
@@ -238,6 +244,9 @@ async function optimizeCV(cvBuffer, mimetype, originalname, jd, market = null) {
   const informe = splitIdx > 0
     ? raw.slice(splitIdx + '###INFORME_HTML###'.length).trim()
     : '';
+
+  console.log('[optimize] cv_optimized length:', cvOptimized.length);
+  console.log('[optimize] informe length:', informe.length);
 
   const usage = {
     input_tokens:  message.usage?.input_tokens  ?? null,
