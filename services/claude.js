@@ -239,7 +239,13 @@ async function optimizeCV(cvBuffer, mimetype, originalname, jd, market = null) {
     ? raw.slice(splitIdx + '###INFORME_HTML###'.length).trim()
     : '';
 
-  return { cv_optimized: cvOptimized, informe };
+  const usage = {
+    input_tokens:  message.usage?.input_tokens  ?? null,
+    output_tokens: message.usage?.output_tokens ?? null,
+    stop_reason:   message.stop_reason          ?? null,
+  };
+
+  return { cv_optimized: cvOptimized, informe, usage };
 }
 
 module.exports = { analyzeCV, checkIsCV, optimizeCV };

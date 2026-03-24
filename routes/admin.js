@@ -498,7 +498,7 @@ router.post('/cvs/:sessionId/optimize', requireAdmin, async (req, res) => {
       { onConflict: 'session_id' }
     );
 
-    return res.json({ ok: true, cv_optimized: result.cv_optimized, informe: result.informe });
+    return res.json({ ok: true, cv_optimized: result.cv_optimized, informe: result.informe, usage: result.usage });
   } catch (err) {
     console.error('[admin/optimize]', err.message);
     return res.status(500).json({ ok: false, error: err.message });

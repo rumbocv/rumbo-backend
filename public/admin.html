@@ -266,7 +266,10 @@
 <div id="resultModal" onclick="if(event.target===this)closeResultModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:12px;width:700px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
     <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <span style="font-size:15px;font-weight:700">✅ CV Optimizado</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:15px;font-weight:700">✅ CV Optimizado</span>
+        <span id="tokenBadge" style="display:none;font-size:11px;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:2px 8px;font-family:monospace"></span>
+      </div>
       <div style="display:flex;gap:8px;align-items:center">
         <button onclick="downloadOptimization()" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">↓ Descargar todo</button>
         <button onclick="closeResultModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;line-height:1">×</button>
@@ -846,6 +849,15 @@
       closeOptimizeModal();
       document.getElementById('resultCV').srcdoc      = data.cv_optimized;
       document.getElementById('resultInforme').srcdoc = data.informe;
+      const badge = document.getElementById('tokenBadge');
+      if (data.usage?.output_tokens != null) {
+        badge.textContent = `↑${data.usage.input_tokens} ↓${data.usage.output_tokens} tokens${data.usage.stop_reason === 'max_tokens' ? ' ⚠️ TRUNCADO' : ''}`;
+        badge.style.display = 'inline';
+        badge.style.background = data.usage.stop_reason === 'max_tokens' ? '#fef2f2' : '#f3f4f6';
+        badge.style.color      = data.usage.stop_reason === 'max_tokens' ? '#dc2626'  : '#6b7280';
+      } else {
+        badge.style.display = 'none';
+      }
       document.getElementById('resultModal').style.display = 'flex';
       loadCVs(); // refresh download button state
     } catch (err) {
