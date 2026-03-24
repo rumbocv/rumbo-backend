@@ -20,6 +20,9 @@ async function sendMetaEvent(eventName, opts = {}) {
 
   const userData = {
     em:                hash(opts.email),
+    fn:                hash(opts.firstName),
+    ln:                hash(opts.lastName),
+    external_id:       hash(opts.externalId),
     client_ip_address: opts.ip,
     client_user_agent: opts.userAgent,
     fbp:               opts.fbp,

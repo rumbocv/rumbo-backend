@@ -149,9 +149,7 @@
     }
 
     async function initSupabase() {
-      const res = await fetch('/api/admin/config');
-      const { supabaseUrl, supabaseAnonKey } = await res.json();
-      supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+      supabaseClient = supabase.createClient(window.__SB_URL__, window.__SB_ANON__);
     }
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {

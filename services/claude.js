@@ -71,26 +71,62 @@ async function checkIsCV(fileBuffer, mimetype, originalname) {
   }
 }
 
+function extractJson(raw) {
+  // Strip markdown code fences if present
+  let text = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  // Try direct parse
+  try { return JSON.parse(text); } catch {}
+  // Try to extract first JSON object from text (handles leading/trailing prose)
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) { try { return JSON.parse(match[0]); } catch {} }
+  return null;
+}
+
+function mapApiError(err) {
+  const status = err.status || err.statusCode;
+  const type   = err.error?.type || '';
+  if (status === 529 || type === 'overloaded_error') {
+    return new Error('Hay muchas solicitudes en este momento. Esperá unos segundos e intentá de nuevo.');
+  }
+  if (status === 429 || type === 'rate_limit_error') {
+    return new Error('Se alcanzó el límite de solicitudes. Intentá en unos minutos.');
+  }
+  if (status >= 500) {
+    return new Error('El servicio de análisis no está disponible. Intentá de nuevo en unos minutos.');
+  }
+  return err;
+}
+
+async function callClaude(params) {
+  try {
+    return await client.messages.create(params);
+  } catch (err) {
+    throw mapApiError(err);
+  }
+}
+
 async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
-  const isPdf = mimetype === 'application/pdf' || originalname.toLowerCase().endsWith('.pdf');
+  const isPdf  = mimetype === 'application/pdf' || originalname.toLowerCase().endsWith('.pdf');
   const prompt = buildPrompt(puesto);
 
-  let message;
+  const MAX_TOKENS = 1600;
 
-  if (isPdf) {
-    message = await client.messages.create({
-      model:       'claude-haiku-4-5-20251001',
-      max_tokens:  1200,
-      temperature: 0,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fileBuffer.toString('base64') } },
-          { type: 'text', text: prompt },
-        ],
-      }],
-    });
-  } else {
+  async function callOnce() {
+    if (isPdf) {
+      return callClaude({
+        model:       'claude-haiku-4-5-20251001',
+        max_tokens:  MAX_TOKENS,
+        temperature: 0,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fileBuffer.toString('base64') } },
+            { type: 'text', text: prompt },
+          ],
+        }],
+      });
+    }
+
     let extractedText;
     try {
       const result = await mammoth.extractRawText({ buffer: fileBuffer });
@@ -98,14 +134,12 @@ async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
     } catch (err) {
       throw new Error(`No se pudo extraer texto del archivo: ${err.message}`);
     }
-
     if (!extractedText || extractedText.trim().length < 50) {
       throw new Error('El archivo parece estar vacío o no contiene texto legible.');
     }
-
-    message = await client.messages.create({
+    return callClaude({
       model:       'claude-haiku-4-5-20251001',
-      max_tokens:  1200,
+      max_tokens:  MAX_TOKENS,
       temperature: 0,
       messages: [{
         role: 'user',
@@ -114,14 +148,98 @@ async function analyzeCV(fileBuffer, mimetype, originalname, puesto = null) {
     });
   }
 
-  const rawText = message.content[0]?.text ?? '';
-  const cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  // First attempt
+  let message = await callOnce();
 
-  try {
-    return JSON.parse(cleaned);
-  } catch {
-    throw new Error('Claude devolvió una respuesta inválida. Intentá de nuevo.');
+  // Detect truncation and log it
+  if (message.stop_reason === 'max_tokens') {
+    console.warn('[claude] response truncated — retrying with higher token limit');
+    if (isPdf) {
+      message = await callClaude({
+        model:       'claude-haiku-4-5-20251001',
+        max_tokens:  2200,
+        temperature: 0,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fileBuffer.toString('base64') } },
+            { type: 'text', text: prompt },
+          ],
+        }],
+      });
+    }
   }
+
+  const rawText = message.content[0]?.text ?? '';
+  const parsed  = extractJson(rawText);
+
+  if (parsed) return parsed;
+
+  // One retry on parse failure (Claude occasionally adds preamble)
+  console.warn('[claude] JSON parse failed — retrying once. Raw:', rawText.slice(0, 200));
+  const retry = await callOnce();
+  const retryText   = retry.content[0]?.text ?? '';
+  const retryParsed = extractJson(retryText);
+
+  if (retryParsed) return retryParsed;
+
+  console.error('[claude] JSON parse failed after retry. Raw:', retryText.slice(0, 400));
+  throw new Error('El análisis no pudo completarse. Intentá de nuevo en unos segundos.');
 }
 
-module.exports = { analyzeCV, checkIsCV };
+const OPTIMIZATION_SYSTEM_PROMPT = require('./optimizationPrompt.js');
+
+async function optimizeCV(cvBuffer, mimetype, originalname, jd, market = null) {
+  const isPdf = mimetype === 'application/pdf' || originalname.toLowerCase().endsWith('.pdf');
+  const jobBlock = `<oferta_laboral>\n${jd}\n</oferta_laboral>\n\n<mercado_objetivo>\n${market || 'No especificado'}\n</mercado_objetivo>`;
+
+  let message;
+  if (isPdf) {
+    message = await callClaude({
+      model:       'claude-sonnet-4-6',
+      max_tokens:  8192,
+      temperature: 0.1,
+      system:      OPTIMIZATION_SYSTEM_PROMPT,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: cvBuffer.toString('base64') } },
+          { type: 'text', text: jobBlock },
+        ],
+      }],
+    });
+  } else {
+    let cvText;
+    try {
+      const result = await mammoth.extractRawText({ buffer: cvBuffer });
+      cvText = result.value || '';
+    } catch (err) {
+      throw new Error(`No se pudo extraer texto del CV: ${err.message}`);
+    }
+    message = await callClaude({
+      model:       'claude-sonnet-4-6',
+      max_tokens:  8192,
+      temperature: 0.1,
+      system:      OPTIMIZATION_SYSTEM_PROMPT,
+      messages: [{
+        role: 'user',
+        content: `<cv_original>\n${cvText}\n</cv_original>\n\n${jobBlock}`,
+      }],
+    });
+  }
+
+  const raw = message.content[0]?.text ?? '';
+
+  // Split on ###INFORME_HTML### delimiter
+  const splitIdx = raw.indexOf('###INFORME_HTML###');
+  const cvOptimized = splitIdx > 0
+    ? raw.slice(0, splitIdx).replace('###CV_HTML###', '').trim()
+    : raw.trim();
+  const informe = splitIdx > 0
+    ? raw.slice(splitIdx + '###INFORME_HTML###'.length).trim()
+    : '';
+
+  return { cv_optimized: cvOptimized, informe };
+}
+
+module.exports = { analyzeCV, checkIsCV, optimizeCV };

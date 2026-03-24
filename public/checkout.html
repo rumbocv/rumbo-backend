@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Completá tu compra — Rumbo</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0B1929;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .top-bar {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: #00D26A; }
+
+    /* ── Main ───────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 40px;
+      gap: 0;
+    }
+
+    /* ── Hero text ──────────────────────────── */
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+      max-width: 380px;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 79, 79, 0.15);
+      border: 1px solid rgba(255, 79, 79, 0.3);
+      color: #ff6b6b;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .hero-tag::before { content: '●'; font-size: 7px; }
+    .hero h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: #00D26A;
+    }
+    .hero p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.65;
+    }
+    .hero p strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+    /* ── Plan cards ─────────────────────────── */
+    .plans {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .plan-card {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms, transform 120ms;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .plan-card:active { transform: scale(0.985); }
+    .plan-card.selected {
+      background: rgba(0, 210, 106, 0.08);
+      border-color: #00D26A;
+    }
+    .plan-card.selected .plan-price { color: #00D26A; }
+
+    .plan-badge {
+      position: absolute;
+      top: -11px;
+      right: 16px;
+      background: #00D26A;
+      color: #0B1929;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .plan-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .plan-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .plan-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #00D26A;
+      white-space: nowrap;
+      transition: color 200ms;
+    }
+    .plan-old-price {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: line-through;
+      white-space: nowrap;
+    }
+    .plan-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .plan-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.4;
+    }
+    .plan-card.selected .plan-features li { color: rgba(255,255,255,0.75); }
+    .check {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background 200ms;
+    }
+    .plan-card.selected .check {
+      background: #00D26A;
+    }
+    .check svg { display: block; }
+
+    /* ── CTA block ──────────────────────────── */
+    .cta-block {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(180deg, #00E074 0%, #00BA5A 100%);
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #0B1929;
+      cursor: pointer;
+      letter-spacing: -0.1px;
+      transition: opacity 180ms, transform 120ms;
+      position: relative;
+      overflow: hidden;
+    }
+    .submit-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background 180ms;
+    }
+    .submit-btn:hover::after { background: rgba(255,255,255,0.08); }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .trust-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      font-weight: 500;
+    }
+    .trust-item svg { opacity: 0.6; }
+
+    .error-box {
+      background: rgba(220, 38, 38, 0.12);
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      color: #fca5a5;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-top: 12px;
+      font-size: 13px;
+      display: none;
+      text-align: center;
+    }
+
+    /* ── States ─────────────────────────────── */
+    .state-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 48px 32px;
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+    }
+    .state-card h2 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .state-card p  { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.6; }
+
+    .loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .loading-dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00D26A;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+      40%            { opacity: 1;   transform: scale(1); }
+    }
+
+    /* ── Responsive ─────────────────────────── */
+    @media (min-width: 480px) {
+      .hero h1 { font-size: 30px; }
+      .main { padding: 40px 24px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="logo">rumbo<span>.</span></div>
+  </div>
+
+  <div class="main" id="app">
+    <div class="state-card">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <p style="color:rgba(255,255,255,0.4);font-size:14px">Cargando tu diagnóstico...</p>
+    </div>
+  </div>
+
+  <script>
+    const API_URL   = window.location.origin;
+    const params    = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session');
+
+    const CHECK_ICON = `<svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+      <path d="M2 6l3 3 5-5" stroke="#0B1929" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+    const CHECK_ICON_DIM = `<svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+      <path d="M2 6l3 3 5-5" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+    function setState(html) {
+      document.getElementById('app').innerHTML = html;
+    }
+
+    function showError(msg) {
+      setState(`
+        <div class="state-card">
+          <h2>${msg.title}</h2>
+          <p>${msg.body}</p>
+        </div>
+      `);
+    }
+
+    if (!sessionId) {
+      showError({ title: 'Link inválido', body: 'No se encontró una sesión válida.' });
+    } else {
+      fetch(`${API_URL}/api/analyze/session/${sessionId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!data.ok || data.paid) {
+            showError({
+              title: 'Sesión no disponible',
+              body: data.error || 'Esta sesión expiró o ya fue pagada.',
+            });
+            return;
+          }
+
+          const firstName = data.name ? data.name.split(' ')[0] : null;
+          const errores   = data.data?.errores?.length || 0;
+
+          const h1 = firstName
+            ? `${firstName}, tu CV está<br><em>perdiendo entrevistas</em>`
+            : `Tu CV está<br><em>perdiendo entrevistas</em>`;
+
+          const sub = errores > 0
+            ? `Encontramos <strong>${errores} problemas</strong> que los filtros automáticos usan para descartarlo. Elegí tu plan y lo solucionamos hoy.`
+            : `Los filtros automáticos descartan la mayoría de los CVs antes de que alguien los lea. Elegí tu plan y lo solucionamos hoy.`;
+
+          setState(`
+            <div class="hero">
+              <div class="hero-tag">Tu diagnóstico está listo</div>
+              <h1>${h1}</h1>
+              <p>${sub}</p>
+            </div>
+
+            <div class="plans">
+
+              <div class="plan-card" data-tier="informe" onclick="selectTier(this)">
+                <div class="plan-top">
+                  <span class="plan-name">Informe Completo</span>
+                  <span class="plan-old-price">$39.990</span>
+                  <span class="plan-price">$19.990</span>
+                </div>
+                <ul class="plan-features">
+                  <li><span class="check">${CHECK_ICON_DIM}</span>Diagnóstico completo con todos los errores</li>
+                  <li><span class="check">${CHECK_ICON_DIM}</span>Keywords faltantes para tu sector</li>
+                  <li><span class="check">${CHECK_ICON_DIM}</span>Guía paso a paso para corregirlo</li>
+                </ul>
+              </div>
+
+              <div class="plan-card selected" data-tier="cv" onclick="selectTier(this)">
+                <div class="plan-badge">50% DESCUENTO</div>
+                <div class="plan-top">
+                  <span class="plan-name">CV Reescrito</span>
+                  <span class="plan-old-price">$59.990</span>
+                  <span class="plan-price">$29.990</span>
+                </div>
+                <ul class="plan-features">
+                  <li><span class="check">${CHECK_ICON}</span>Todo lo del Informe Completo</li>
+                  <li><span class="check">${CHECK_ICON}</span>CV reescrito y optimizado por expertos</li>
+                  <li><span class="check">${CHECK_ICON}</span>Listo para enviar en 24 hs</li>
+                </ul>
+              </div>
+
+            </div>
+
+            <div class="cta-block">
+              <button class="submit-btn" id="submitBtn" onclick="startPayment()">
+                Quiero mejorar mi CV
+              </button>
+              <div class="error-box" id="error"></div>
+              <div class="trust-row">
+                <span class="trust-item">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Pago seguro
+                </span>
+                <span class="trust-item">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  Entrega en 24 hs
+                </span>
+                <span class="trust-item">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  Sin suscripción
+                </span>
+              </div>
+            </div>
+          `);
+
+          window.checkoutData = { sessionId, tier: 'cv' };
+        })
+        .catch(() => showError({ title: 'Error de conexión', body: 'No se pudo cargar tu sesión. Intentá de nuevo.' }));
+    }
+
+    function selectTier(card) {
+      document.querySelectorAll('.plan-card').forEach(c => {
+        c.classList.remove('selected');
+        c.querySelectorAll('.check').forEach((ch, i) => {
+          ch.innerHTML = CHECK_ICON_DIM;
+        });
+      });
+      card.classList.add('selected');
+      card.querySelectorAll('.check').forEach(ch => {
+        ch.innerHTML = CHECK_ICON;
+      });
+      window.checkoutData.tier = card.dataset.tier;
+    }
+
+    async function startPayment() {
+      const { sessionId, tier } = window.checkoutData || {};
+      if (!tier) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Redirigiendo...';
+
+      try {
+        const res  = await fetch(`${API_URL}/api/payment/create`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ sessionId, tier }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          window.location.href = data.checkoutUrl;
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Quiero mejorar mi CV';
+          const err = document.getElementById('error');
+          err.textContent = data.error || 'Error al crear el pago. Intentá de nuevo.';
+          err.style.display = 'block';
+        }
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Quiero mejorar mi CV';
+        const err = document.getElementById('error');
+        err.textContent = 'Error de conexión. Intentá de nuevo.';
+        err.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

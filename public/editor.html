@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor — Rumbo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+    /* ── Toolbar ── */
+    #toolbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 52px; background: #0f1f3d;
+      display: flex; align-items: center; gap: 8px; padding: 0 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .tb-brand { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.3px; margin-right: 8px; }
+    .tb-brand span { color: #22c55e; }
+    .tb-sep { width: 1px; height: 24px; background: rgba(255,255,255,0.15); margin: 0 2px; }
+    .tb-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2);
+      color: #fff; border-radius: 6px; padding: 6px 14px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .tb-btn:hover { background: rgba(255,255,255,0.18); }
+    .tb-btn.primary { background: #6366f1; border-color: #6366f1; }
+    .tb-btn.primary:hover { background: #4f46e5; }
+    .tb-btn.green { background: #22c55e; border-color: #22c55e; }
+    .tb-btn.green:hover { background: #16a34a; }
+    .tb-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #toolbar .hint { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 6px; }
+    #editingTools { display: none; align-items: center; gap: 8px; }
+
+    /* ── Drop zone ── */
+    #dropzone {
+      margin-top: 52px; min-height: calc(100vh - 52px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    }
+    #dropzone.drag-over { background: #e0e7ff; }
+    .dz-box {
+      border: 2px dashed #c7d2fe; border-radius: 16px; background: #fff;
+      padding: 52px 64px; text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s; max-width: 480px; width: 100%;
+    }
+    .dz-box:hover, #dropzone.drag-over .dz-box { border-color: #6366f1; background: #f5f3ff; }
+    .dz-icon { font-size: 40px; margin-bottom: 12px; }
+    .dz-title { font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+    .dz-sub { font-size: 13px; color: #6b7280; }
+
+    /* ── Canvas ── */
+    #canvas { display: none; padding: 72px 24px 60px; justify-content: center; }
+
+    /* ── Document shell ── */
+    #docShell {
+      width: 794px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    }
+
+    /* iframe fills shell with no border */
+    #docFrame { width: 794px; border: none; display: block; }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff !important; }
+      #toolbar, #dropzone { display: none !important; }
+      #canvas { display: block !important; padding: 0 !important; }
+      #docShell { width: 100% !important; box-shadow: none !important; }
+      #docFrame { width: 100% !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div id="toolbar">
+  <div class="tb-brand">Rumbo<span>.</span></div>
+  <div class="tb-sep"></div>
+
+  <button class="tb-btn primary" onclick="document.getElementById('htmlInput').click()">
+    📂 Importar HTML
+  </button>
+  <input type="file" id="htmlInput" accept=".html,.htm" style="display:none" onchange="importHtml(event)">
+
+  <div id="editingTools">
+    <div class="tb-sep"></div>
+    <button class="tb-btn" id="imgBtn" onclick="document.getElementById('imgInput').click()">
+      🖼 Reemplazar imagen
+    </button>
+    <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="replaceImage(event)">
+    <div class="tb-sep"></div>
+    <button class="tb-btn green" id="pdfBtn" onclick="exportPdf()">
+      ↓ Exportar PDF
+    </button>
+    <span class="hint">Hacé click en el texto para editarlo · Click en una imagen para reemplazarla</span>
+  </div>
+</div>
+
+<!-- Drop zone (initial state) -->
+<div id="dropzone" onclick="document.getElementById('htmlInput').click()">
+  <div class="dz-box">
+    <div class="dz-icon">📄</div>
+    <div class="dz-title">Importar archivo HTML</div>
+    <div class="dz-sub">Hacé click o arrastrá un archivo .html<br>para empezar a editar</div>
+  </div>
+</div>
+
+<!-- Canvas (after import) -->
+<div id="canvas">
+  <div id="docShell">
+    <iframe id="docFrame" scrolling="no"></iframe>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  let selectedImg = null;
+
+  // ── Drag & drop ───────────────────────────────────────────────────
+  const dz = document.getElementById('dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) loadFile(file);
+  });
+
+  // ── Import HTML ───────────────────────────────────────────────────
+  function importHtml(e) {
+    const file = e.target.files[0];
+    if (file) loadFile(file);
+    e.target.value = '';
+  }
+
+  function loadFile(file) {
+    const reader = new FileReader();
+    reader.onload = ev => renderHtml(ev.target.result);
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  function renderHtml(raw) {
+    // Remove only INLINE scripts (no src attr) — keeps external CDN scripts like Tailwind
+    const clean = raw.replace(/<script\b(?![^>]*\bsrc\b)[^>]*>[\s\S]*?<\/script\s*>/gi, '');
+
+    const iframe = document.getElementById('docFrame');
+
+    // Show canvas FIRST so iframe gets laid out and scrollHeight works
+    document.getElementById('dropzone').style.display = 'none';
+    document.getElementById('canvas').style.display = 'flex';
+    document.getElementById('editingTools').style.display = 'flex';
+    iframe.style.height = '1200px'; // temp height while loading
+
+    iframe.addEventListener('load', function handler() {
+      iframe.removeEventListener('load', handler);
+      const idoc = iframe.contentDocument;
+
+      // Resize to actual content height
+      const h = Math.max(idoc.documentElement.scrollHeight, idoc.body.scrollHeight, 800);
+      iframe.style.height = h + 'px';
+
+      // Inject editing CSS into iframe document
+      const editStyle = idoc.createElement('style');
+      editStyle.textContent = `
+        [data-editable]:hover {
+          outline: 2px dashed rgba(99,102,241,0.5) !important;
+          outline-offset: 1px; cursor: text;
+        }
+        [data-editable]:focus {
+          outline: 2px solid #6366f1 !important;
+          outline-offset: 1px; background: rgba(99,102,241,0.03);
+        }
+        .img-wrap { position: relative; display: inline-block; cursor: pointer; }
+        .img-overlay {
+          position: absolute; inset: 0; background: rgba(99,102,241,0.7);
+          display: flex; align-items: center; justify-content: center;
+          opacity: 0; transition: opacity 0.2s;
+          font-size: 12px; font-weight: 700; color: #fff; text-align: center;
+        }
+        .img-wrap:hover .img-overlay { opacity: 1; }
+      `;
+      idoc.head.appendChild(editStyle);
+
+      makeEditable(idoc.body);
+      wrapImages(idoc.body);
+
+      // Tab / Escape inside iframe
+      idoc.addEventListener('keydown', e => {
+        if (e.key === 'Tab' && idoc.activeElement?.isContentEditable) {
+          e.preventDefault();
+          idoc.execCommand('insertText', false, '    ');
+        }
+        if (e.key === 'Escape' && idoc.activeElement?.isContentEditable) {
+          idoc.activeElement.blur();
+        }
+      });
+
+    });
+
+    // Assign cleaned raw HTML — preserves exact original styles
+    iframe.srcdoc = clean;
+  }
+
+  // ── Make text nodes editable ──────────────────────────────────────
+  const TEXT_TAGS = new Set(['P','H1','H2','H3','H4','H5','H6','SPAN','LI','TD','TH','A','STRONG','EM','B','I','LABEL','CAPTION','BLOCKQUOTE','PRE','DIV']);
+
+  function makeEditable(root) {
+    const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+    const candidates = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      if (!TEXT_TAGS.has(node.tagName)) continue;
+      if (node.querySelector('img')) continue;
+      const directText = [...node.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+      if (directText) candidates.push(node);
+    }
+    candidates.forEach(el => {
+      el.setAttribute('contenteditable', 'true');
+      el.setAttribute('data-editable', '1');
+      el.style.outline = 'none';
+    });
+  }
+
+  // ── Image replacement ─────────────────────────────────────────────
+  function wrapImages(root) {
+    root.querySelectorAll('img').forEach(img => {
+      if (img.parentElement.classList.contains('img-wrap')) return;
+      const wrap = root.ownerDocument.createElement('span');
+      wrap.className = 'img-wrap';
+      wrap.title = 'Click para reemplazar imagen';
+      img.replaceWith(wrap);
+      wrap.appendChild(img);
+      const overlay = root.ownerDocument.createElement('span');
+      overlay.className = 'img-overlay';
+      overlay.textContent = '🖼 Reemplazar';
+      wrap.appendChild(overlay);
+      wrap.addEventListener('click', () => {
+        selectedImg = img;
+        document.getElementById('imgInput').click();
+      });
+    });
+  }
+
+  function replaceImage(e) {
+    const file = e.target.files[0];
+    if (!file || !selectedImg) return;
+    const reader = new FileReader();
+    reader.onload = ev => { selectedImg.src = ev.target.result; selectedImg = null; };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  // ── Export PDF via Playwright backend ─────────────────────────────
+  async function exportPdf() {
+    const btn = document.getElementById('pdfBtn');
+    btn.innerHTML = '<div class="spinner"></div> Generando…';
+    btn.disabled = true;
+
+    const iframe = document.getElementById('docFrame');
+    const idoc = iframe.contentDocument;
+
+    // Strip editing markers before capturing HTML
+    const editables = [...idoc.querySelectorAll('[data-editable]')];
+    editables.forEach(el => {
+      el.removeAttribute('data-editable');
+      el.removeAttribute('contenteditable');
+      el.style.outline = '';
+    });
+    idoc.querySelectorAll('.img-overlay').forEach(el => el.style.display = 'none');
+
+    const html = idoc.documentElement.outerHTML;
+
+    // Restore editing state
+    editables.forEach(el => {
+      el.setAttribute('contenteditable', 'true');
+      el.setAttribute('data-editable', '1');
+    });
+    idoc.querySelectorAll('.img-overlay').forEach(el => el.style.display = '');
+
+    try {
+      const res = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      // Stream the PDF blob and trigger download
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = 'documento.pdf';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch (err) {
+      console.error('[pdf]', err);
+      alert('Error al generar el PDF: ' + err.message);
+    } finally {
+      btn.innerHTML = '↓ Exportar PDF';
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

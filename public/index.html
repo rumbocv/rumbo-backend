@@ -5,11 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rumbo — Tu CV contra el Filtro Invisible</title>
   <meta name="description" content="El 75% de los CVs son descartados por un robot antes de llegar a un humano. Rumbo analiza y optimiza tu CV para pasar los filtros ATS en 24 horas.">
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "vz0933axs5");
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Meta Pixel — reemplazá TU_PIXEL_ID con el ID real -->
   <script>
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -20,8 +26,8 @@
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '904043962618454');
-    fbq('track', 'PageView');
-    console.log('%c[Pixel] PageView fired', 'color: #1877F2; font-weight: bold');
+    window._pvEventId = 'pageview_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    fbq('track', 'PageView', {}, { eventID: window._pvEventId });
   </script>
   <noscript>
     <img height="1" width="1" style="display:none"
@@ -1493,15 +1499,30 @@
     }
     .dropzone.analyzing { cursor: default; pointer-events: none; }
     .dropzone.asking    { cursor: default; }
+    .dropzone.situating { cursor: default; }
+    .dropzone.emailing  { cursor: default; }
 
-    .dz-default  { transition: opacity 300ms var(--ease-out); }
-    .dz-loading  { display: none; }
-    .dz-result   { display: none; }
-    .dz-asking   { display: none; }
+    .dz-default   { transition: opacity 300ms var(--ease-out); }
+    .dz-loading   { display: none; }
+    .dz-situation { display: none; }
+    .dz-email     { display: none; }
+    .dz-result    { display: none; }
+    .dz-asking    { display: none; }
 
-    /* asking state — hide default, show asking card */
-    .dropzone.asking .dz-default  { display: none; }
-    .dropzone.asking .dz-asking   { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+    /* asking state */
+    .dropzone.asking .dz-default    { display: none; }
+    .dropzone.asking .dz-asking     { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+
+    /* situating state */
+    .dropzone.situating .dz-default   { display: none; }
+    .dropzone.situating .dz-asking    { display: none; }
+    .dropzone.situating .dz-situation { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+
+    /* emailing state */
+    .dropzone.emailing .dz-default   { display: none; }
+    .dropzone.emailing .dz-asking    { display: none; }
+    .dropzone.emailing .dz-situation { display: none; }
+    .dropzone.emailing .dz-email     { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
 
     /* asking card styles */
     .dz-asking-title {
@@ -1642,7 +1663,9 @@
       opacity: 0;
       cursor: pointer;
     }
-    .dropzone.asking .dz-input { display: none; }
+    .dropzone.asking .dz-input    { display: none; }
+    .dropzone.situating .dz-input { display: none; }
+    .dropzone.emailing .dz-input  { display: none; }
 
     /* Analyzing state */
     .dz-spinner {
@@ -1939,381 +1962,222 @@
        MODAL — Result overlay
     ========================================= */
 
-    /* Overlay — hidden by default, fades in on .open */
     #modal {
       position: fixed;
       inset: 0;
       z-index: 200;
-      background: rgba(10, 22, 40, 0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(20, 24, 38, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--space-md);
+      padding: 16px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 320ms var(--ease-out);
+      transition: opacity 250ms ease;
     }
-    #modal.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    #modal.open { opacity: 1; pointer-events: auto; }
 
-    /* Modal card */
     .modal-card {
-      background: var(--white);
-      border-radius: 16px;
-      padding: var(--space-lg);
-      max-width: 520px;
+      background: #FFFFFF;
+      border-radius: 20px;
       width: 100%;
-      max-height: 90vh;
+      max-width: 500px;
+      max-height: 92vh;
       overflow-y: auto;
       position: relative;
-      box-shadow:
-        0 0 0 1px rgba(10,22,40,0.06),
-        0 8px 32px rgba(10,22,40,0.18),
-        0 32px 80px rgba(10,22,40,0.14);
-      /* Prevent the card click from bubbling to overlay */
-      scroll-behavior: smooth;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1);
+      animation: popupIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
+    @keyframes popupIn {
+      from { opacity: 0; transform: scale(0.93) translateY(16px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-card::-webkit-scrollbar { width: 4px; }
+    .modal-card::-webkit-scrollbar-track { background: transparent; }
+    .modal-card::-webkit-scrollbar-thumb { background: #E4E7EE; border-radius: 4px; }
 
-    /* Close button — top right */
     .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--gray-ui);
-      transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out), background 180ms var(--ease-out);
-      flex-shrink: 0;
+      position: absolute; top: 14px; right: 14px;
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid #E4E7EE; background: #fff;
+      color: #9198AD; font-size: 15px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; z-index: 2;
     }
-    .modal-close:hover {
-      color: var(--navy);
-      border-color: rgba(10,22,40,0.2);
-      background: var(--gray-bg);
-    }
-    .modal-close svg {
-      width: 12px;
-      height: 12px;
-      stroke: currentColor;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      fill: none;
-    }
+    .modal-close:hover { border-color: #9198AD; color: #1A1D26; }
 
-    /* Score display */
-    .modal-score-row {
-      display: flex;
-      align-items: baseline;
-      gap: 0.5rem;
-      margin-bottom: 0.375rem;
-      flex-wrap: wrap;
-    }
-    .modal-score-num {
-      font-family: var(--font-display);
-      font-size: clamp(4rem, 10vw, 5.5rem);
-      font-weight: 900;
-      color: #FF4F4F;
-      line-height: 1;
-      letter-spacing: -0.04em;
-      font-variant-numeric: tabular-nums;
-    }
-    .modal-score-of {
-      font-size: 1.25rem;
-      color: rgba(10,22,40,0.3);
-      font-weight: 400;
-      align-self: flex-end;
-      padding-bottom: 0.2rem;
-    }
-    .modal-score-nivel {
-      display: inline-block;
-      font-size: 0.6875rem;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: #FF4F4F;
-      background: rgba(255, 79, 79, 0.12);
-      border: 1px solid rgba(255, 79, 79, 0.22);
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-      align-self: flex-end;
-      margin-bottom: 0.3rem;
-    }
-    .modal-score-context {
-      font-size: 0.875rem;
-      color: rgba(10,22,40,0.45);
-      margin-bottom: 1.25rem;
-    }
+    /* Header */
+    .pm-header { padding: 32px 28px 20px; text-align: center; }
+    .pm-header h2 { font-size: 21px; font-weight: 700; color: #1A1D26; line-height: 1.3; margin-bottom: 6px; }
+    .pm-header-sub { font-size: 14px; color: #5F6580; line-height: 1.55; }
 
-    /* Problems list */
-    .modal-problems {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    .modal-problem-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.625rem;
-      padding: 0.625rem 0.75rem;
-      background: rgba(255,79,79,0.04);
-      border: 1px solid rgba(255,79,79,0.12);
-      border-radius: 8px;
-    }
-    .modal-problem-icon {
-      font-size: 0.875rem;
-      flex-shrink: 0;
-      line-height: 1.5;
-    }
-    .modal-problem-text {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: rgba(10,22,40,0.8);
-      line-height: 1.4;
-    }
-    .modal-problem-more {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      color: var(--navy);
-      background: rgba(10,22,40,0.04);
-      border: 1px solid rgba(10,22,40,0.08);
-      border-radius: 8px;
-      padding: 0.625rem 0.875rem;
-      margin-bottom: 1rem;
-    }
-    .modal-problem-more svg {
-      width: 14px;
-      height: 14px;
-      stroke: var(--navy);
-      stroke-width: 2;
-      stroke-linecap: round;
-      fill: none;
-      flex-shrink: 0;
-    }
-    .modal-pain-line {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: rgba(10,22,40,0.6);
-      line-height: 1.5;
-      margin-top: 0.75rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-light);
-    }
+    /* Score ring */
+    .pm-score-ring { position: relative; width: 72px; height: 72px; margin: 0 auto 14px; }
+    .pm-score-ring svg { width: 100%; height: 100%; }
+    .pm-score-number { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -55%); font-size: 24px; font-weight: 700; color: #EF4444; }
+    .pm-score-of { position: absolute; top: 50%; left: 50%; transform: translate(-50%, 55%); font-size: 11px; color: #9198AD; }
+    .pm-score-nivel { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; margin-bottom: 12px; color: #EF4444; background: #FEF2F2; border: 1px solid rgba(239,68,68,0.2); }
 
-    /* Pricing header */
-    .modal-pricing-header {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--navy);
-      line-height: 1.4;
-      margin-bottom: 0.875rem;
-    }
+    /* Findings */
+    .pm-findings { margin: 0 20px; background: #F7F8FA; border: 1px solid #ECEEF3; border-radius: 12px; padding: 16px 18px; }
+    .pm-findings-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #EF4444; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+    .pm-finding-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; }
+    .pm-finding-item + .pm-finding-item { border-top: 1px solid #ECEEF3; }
+    .pm-finding-icon { flex-shrink: 0; width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: #FEF2F2; color: #EF4444; }
+    .pm-finding-icon.warn { background: #FFFBEB; color: #F59E0B; }
+    .pm-finding-text { font-size: 13px; color: #5F6580; line-height: 1.45; }
+    .pm-locked-row { display: none; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #ECEEF3; }
+    .pm-locked-text { font-size: 13px; color: #9198AD; filter: blur(5px); user-select: none; pointer-events: none; flex: 1; }
+    .pm-lock-badge { background: #E8F9EF; border: 1px solid rgba(30,203,94,0.25); border-radius: 100px; padding: 3px 10px; font-size: 10px; font-weight: 600; color: #15A34A; white-space: nowrap; }
 
-    /* Countdown timer */
-    .modal-timer {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      font-size: 0.8125rem;
-      color: rgba(10,22,40,0.5);
-      background: rgba(10,22,40,0.03);
-      border: 1px solid rgba(10,22,40,0.07);
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      margin-bottom: 0.875rem;
-    }
-    .modal-timer-count {
-      font-weight: 700;
-      color: var(--navy);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.02em;
-    }
+    /* Mini comparison */
+    .pm-mini-comp { margin: 12px 20px 0; border: 1px solid #ECEEF3; border-radius: 12px; overflow: hidden; }
+    .pm-mini-header { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #ECEEF3; background: #F7F8FA; }
+    .pm-mini-header span { padding: 8px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-align: center; }
+    .pm-mini-gpt { color: #9198AD; }
+    .pm-mini-rumbo { color: #15A34A; background: #E8F9EF; }
+    .pm-mini-row { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #ECEEF3; font-size: 12.5px; }
+    .pm-mini-row:last-child { border-bottom: none; }
+    .pm-mini-gcell { padding: 9px 14px; display: flex; align-items: center; gap: 7px; color: #9198AD; border-right: 1px solid #ECEEF3; line-height: 1.4; }
+    .pm-mini-rcell { padding: 9px 14px; display: flex; align-items: center; gap: 7px; color: #1A1D26; background: rgba(30,203,94,0.03); line-height: 1.4; }
+    .pm-dot { flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; }
+    .pm-dot.red { background: #EF4444; opacity: 0.6; }
+    .pm-dot.green { background: #1ECB5E; }
+    .pm-mini-footer { padding: 9px 14px; font-size: 12px; color: #9198AD; text-align: center; border-top: 1px solid #ECEEF3; background: #F7F8FA; }
+    .pm-mini-footer strong { color: #5F6580; }
 
-    /* Pricing tiers grid */
-    .modal-tiers {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-    @media (max-width: 500px) {
-      .modal-tiers { grid-template-columns: 1fr; }
-    }
+    /* CTAs */
+    .pm-ctas { padding: 20px 20px 4px; }
+    .modal-tiers { display: flex; flex-direction: column; gap: 10px; }
+    .pm-card { border: 1.5px solid #E4E7EE; border-radius: 14px; padding: 18px; cursor: pointer; transition: all 0.2s ease; display: block; background: #fff; text-decoration: none; }
+    .pm-card:hover { border-color: #1ECB5E; box-shadow: 0 0 0 3px #E8F9EF; }
+    .pm-card.featured { border-color: #1ECB5E; box-shadow: 0 0 0 3px #E8F9EF; position: relative; }
+    .pm-card.featured .pm-popular { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: #1ECB5E; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 14px; border-radius: 100px; white-space: nowrap; }
+    .pm-guarantee { display: flex; align-items: center; justify-content: center; gap: 5px; background: #f0fdf4; border-bottom: 1px solid #bbf7d0; color: #15803d; font-size: 11px; font-weight: 700; padding: 7px 14px; text-align: center; letter-spacing: 0.01em; margin: -18px -18px 14px -18px; border-radius: 12px 12px 0 0; }
+    .pm-guarantee svg { flex-shrink: 0; }
+    .pm-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .pm-card-title { font-size: 15px; font-weight: 700; color: #1A1D26; }
+    .pm-pricing { text-align: right; flex-shrink: 0; margin-left: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+    .pm-price-current { font-size: 14px; font-weight: 700; color: #1A1D26; line-height: 1; }
+    .pm-price-old { font-size: 11px; color: #9198AD; text-decoration: line-through; }
+    .pm-price-badge { display: inline-block; font-size: 11px; font-weight: 700; color: #15A34A; background: #E8F9EF; padding: 2px 7px; border-radius: 6px; margin-left: 2px; }
+    .pm-timer { display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #FEF3C7, #FDE68A); border: 1px solid #F59E0B; border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; }
+    .pm-timer-icon { font-size: 16px; }
+    .pm-timer-text { font-size: 12px; font-weight: 600; color: #92400E; }
+    .pm-timer-count { font-size: 18px; font-weight: 800; color: #B45309; font-variant-numeric: tabular-nums; }
+    .pm-header-good { text-align: center; }
+    .pm-header-good h2 { color: #065F46; font-size: 20px; margin-bottom: 8px; }
+    .pm-header-good .pm-header-sub { color: #047857; }
+    .pm-share-box { background: #F0FDF4; border: 1px solid #10B981; border-radius: 10px; padding: 16px; margin-top: 16px; }
+    .pm-share-label { font-size: 13px; font-weight: 600; color: #065F46; margin-bottom: 10px; }
+    .pm-share-links { display: flex; gap: 8px; justify-content: center; }
+    .pm-share-btn { flex: 1; padding: 10px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; text-decoration: none; transition: opacity 0.2s; }
+    .pm-share-btn:hover { opacity: 0.85; }
+    .pm-share-btn#share-wa { background: #25D366; color: #fff; }
+    .pm-share-btn#share-fb { background: #1877F2; color: #fff; }
+    .pm-share-btn#share-copy { background: #E5E7EB; color: #374151; }
 
-    .modal-tier {
-      border: 1.5px solid var(--border-light);
-      border-radius: 12px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      position: relative;
+    /* ── Share popup (score >= 70) ── */
+    #share-popup {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
     }
-    .modal-tier--featured {
-      border-color: var(--green);
-      background: rgba(0, 210, 106, 0.02);
+    #share-popup.open { opacity: 1; pointer-events: auto; }
+    .sp-card {
+      background: #fff; border-radius: 20px; padding: 32px 28px;
+      max-width: 400px; width: 100%; text-align: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      animation: spIn 0.4s cubic-bezier(0.16,1,0.3,1);
     }
-    .modal-tier-badge {
-      position: absolute;
-      top: -0.6rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.625rem;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: var(--navy);
-      background: var(--green);
-      padding: 0.15rem 0.65rem;
-      border-radius: 999px;
-      white-space: nowrap;
+    @keyframes spIn { from { transform: scale(0.88) translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .sp-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #ECFDF5; color: #065F46;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+      border: 1px solid #A7F3D0; border-radius: 100px; padding: 5px 12px;
+      margin-bottom: 16px;
     }
-    .modal-tier-name {
-      font-size: 0.9375rem;
-      font-weight: 700;
-      color: var(--navy);
+    .sp-score-wrap { display: flex; align-items: baseline; justify-content: center; gap: 3px; margin-bottom: 4px; }
+    .sp-score-big { font-size: 56px; font-weight: 900; color: #10B981; line-height: 1; font-variant-numeric: tabular-nums; }
+    .sp-score-of { font-size: 18px; font-weight: 700; color: #9CA3AF; }
+    .sp-title { font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 8px; line-height: 1.25; }
+    .sp-score-line { font-size: 13px; color: #6B7280; margin-bottom: 20px; line-height: 1.5; }
+    .sp-divider { height: 1px; background: #F3F4F6; margin: 20px 0; }
+    .sp-refer-label { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 6px; }
+    .sp-refer-sub { font-size: 12px; color: #9CA3AF; margin-bottom: 16px; line-height: 1.5; }
+    .sp-btns { display: flex; flex-direction: column; gap: 10px; }
+    .sp-btn-wa {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      background: #25D366; color: #fff;
+      border: none; border-radius: 10px; padding: 14px 20px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: background 0.15s; text-decoration: none;
     }
-    .modal-tier-price-row {
-      display: flex;
-      align-items: baseline;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+    .sp-btn-wa:hover { background: #1ebe57; }
+    .sp-btn-copy {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: #F3F4F6; color: #374151;
+      border: none; border-radius: 10px; padding: 13px 20px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background 0.15s;
     }
-    .modal-tier-price {
-      font-size: 1.375rem;
-      font-weight: 900;
-      color: var(--navy);
-      letter-spacing: -0.02em;
-    }
-    .modal-tier-price-anchor {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: rgba(10,22,40,0.35);
-      text-decoration: line-through;
-    }
-    .modal-tier-discount {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      color: var(--green);
-      background: rgba(0,210,106,0.12);
-      padding: 0.15rem 0.45rem;
-      border-radius: 4px;
-      letter-spacing: 0.02em;
-    }
-    .modal-tier-features {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.375rem;
-      flex: 1;
-      margin-bottom: 0.25rem;
-    }
-    .modal-tier-features li {
-      font-size: 0.75rem;
-      color: rgba(10,22,40,0.7);
-      line-height: 1.4;
-    }
-    .modal-tier-features li.feat-no { color: rgba(10,22,40,0.35); }
-    .modal-tier-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      font-size: 0.8125rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: none;
-      font-family: inherit;
-      transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
-    }
-    .modal-tier-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .modal-tier-btn:active { transform: translateY(0); opacity: 1; }
-    .modal-tier-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .modal-tier-btn--primary {
-      background:
-        radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.18) 0%, transparent 70%),
-        linear-gradient(180deg, #00E074 0%, #00C060 100%);
-      color: var(--navy);
-      box-shadow: 0 0 0 1px rgba(0,210,106,0.4), 0 4px 12px rgba(0,210,106,0.28);
-    }
-    .modal-tier-btn--secondary {
-      background: rgba(10,22,40,0.07);
-      color: var(--navy);
-    }
-    .modal-tier-note {
-      font-size: 0.6875rem;
-      color: rgba(10,22,40,0.35);
-      text-align: center;
-    }
+    .sp-btn-copy:hover { background: #E5E7EB; }
+    .sp-btn-copy.copied { background: #ECFDF5; color: #065F46; }
+    .sp-skip { display: block; margin-top: 18px; font-size: 12px; color: #9CA3AF; cursor: pointer; background: none; border: none; }
+    .sp-skip:hover { color: #6B7280; }
+    .pm-features { list-style: none; display: flex; flex-direction: column; gap: 11px; margin-bottom: 14px; }
+    .pm-features li { font-size: 13px; color: #5F6580; display: flex; align-items: center; gap: 8px; line-height: 1.4; }
+    .pm-check { flex-shrink: 0; width: 18px; height: 18px; background: #E8F9EF; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #15A34A; font-size: 11px; font-weight: 700; }
+    .pm-cross { flex-shrink: 0; width: 18px; height: 18px; background: #FEF2F2; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #EF4444; font-size: 11px; font-weight: 700; }
+    .pm-btn { display: block; width: 100%; text-align: center; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .pm-btn.primary { background: #1ECB5E; color: #fff; box-shadow: 0 2px 12px rgba(30,203,94,0.3); }
+    .pm-btn.primary:hover { background: #15A34A; }
+    .pm-btn.secondary { background: #fff; border: 1.5px solid #E4E7EE; color: #1A1D26; }
+    .pm-btn.secondary:hover { border-color: #9198AD; background: #F7F8FA; }
+    .pm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .pm-card-note { text-align: center; font-size: 11.5px; color: #9198AD; margin-top: 8px; }
+    .pm-anchor { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; padding: 7px 14px; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; font-size: 12.5px; color: #92400E; line-height: 1.4; text-align: center; }
 
-    /* Social proof */
-    .modal-social-proof {
-      text-align: center;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: rgba(10,22,40,0.5);
-      margin-bottom: 0.875rem;
-    }
+    /* Trust */
+    .pm-trust { padding: 16px 20px 6px; }
+    .pm-mp-banner { display: flex; align-items: center; justify-content: center; gap: 10px; background: #EEF4FF; border: 1px solid #D6E4FF; border-radius: 10px; padding: 12px 16px; }
+    .pm-mp-text { font-size: 13px; color: #2D6AE0; font-weight: 600; }
+    .pm-trust-sub { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 10px; }
+    .pm-trust-item { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: #9198AD; }
 
-    /* Human face */
-    .modal-human {
-      display: flex;
-      align-items: center;
-      gap: 0.875rem;
-      padding: 0.875rem;
-      background: rgba(10,22,40,0.02);
-      border: 1px solid var(--border-light);
-      border-radius: 10px;
-      margin-bottom: 0.875rem;
-    }
-    .modal-human-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: rgba(0,210,106,0.12);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: var(--green);
-    }
-    .modal-human-name {
-      font-size: 0.875rem;
-      font-weight: 700;
-      color: var(--navy);
-      margin-bottom: 0.25rem;
-    }
-    .modal-human-bio {
-      font-size: 0.75rem;
-      color: rgba(10,22,40,0.55);
-      line-height: 1.5;
-    }
+    /* Testimonials */
+    .pm-testimonials { padding: 6px 20px 20px; }
+    .pm-tests-label { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #9198AD; text-align: center; margin-bottom: 10px; }
+    .pm-test { background: #F7F8FA; border: 1px solid #ECEEF3; border-radius: 10px; padding: 14px 16px; }
+    .pm-test + .pm-test { margin-top: 8px; }
+    .pm-test-text { font-size: 13px; color: #5F6580; line-height: 1.5; font-style: italic; margin-bottom: 8px; }
+    .pm-test-author { display: flex; align-items: center; gap: 8px; }
+    .pm-test-avatar { width: 28px; height: 28px; border-radius: 50%; background: #E8F9EF; color: #15A34A; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pm-test-name { font-size: 12px; font-weight: 600; color: #1A1D26; }
+    .pm-test-role { font-size: 11px; color: #9198AD; }
+    .pm-test-stars { color: #FBBF24; font-size: 12px; letter-spacing: 1px; margin-left: auto; }
 
-    /* Cost of inaction */
-    .modal-cost-line {
-      font-size: 0.8125rem;
-      color: rgba(10,22,40,0.4);
-      text-align: center;
-      line-height: 1.5;
+    /* Skip */
+    .pm-skip { text-align: center; padding: 0 20px 22px; }
+    .pm-skip a { font-size: 12px; color: #9198AD; text-decoration: none; cursor: pointer; transition: color 0.2s; }
+    .pm-skip a:hover { color: #5F6580; }
+
+    @media (max-width: 480px) {
+      .modal-card { border-radius: 16px; }
+      .pm-header { padding: 28px 18px 16px; }
+      .pm-header h2 { font-size: 19px; }
+      .pm-findings, .pm-mini-comp { margin-left: 14px; margin-right: 14px; }
+      .pm-ctas { padding: 16px 14px 4px; }
+      .pm-testimonials { padding: 6px 14px 16px; }
+      .pm-trust { padding: 14px 14px 6px; }
+      .pm-card { padding: 14px; }
+      .pm-price-current { font-size: 20px; }
     }
 
     /* Error message inside dropzone */
@@ -2578,12 +2442,121 @@
   </section>
 
 
+  <!-- ===================== COMPARATIVO ===================== -->
+  <section style="background:#0B0F1A;padding:0;">
+  <style>
+    .comp-section { max-width: 880px; margin: 0 auto; padding: 60px 24px; }
+    .comp-badge { display:inline-flex;align-items:center;gap:6px;background:rgba(34,224,106,0.12);border:1px solid rgba(34,224,106,0.2);border-radius:100px;padding:6px 16px;font-size:13px;font-weight:500;color:#22E06A;letter-spacing:0.03em;margin-bottom:20px; }
+    .comp-header { text-align:center;margin-bottom:56px; }
+    .comp-header h2 { font-size:clamp(28px,5vw,42px);font-weight:700;line-height:1.15;color:#fff;margin:0 0 14px; }
+    .comp-header h2 span { color:#22E06A; }
+    .comp-subtitle { font-size:17px;color:#9BA3BF;line-height:1.55;max-width:540px;margin:0 auto; }
+    .comp-grid { display:grid;gap:12px; }
+    .comp-row { display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;background:#1E2640;border-radius:14px;overflow:hidden;transition:transform 0.2s ease; }
+    .comp-row:hover { transform:translateY(-1px); }
+    .comp-row.comp-head { background:transparent;gap:2px;position:sticky;top:0;z-index:10; }
+    .comp-row.comp-head .comp-cell { background:#0B0F1A;padding:16px 20px; }
+    .comp-cell { padding:20px;background:#121829;display:flex;flex-direction:column;justify-content:center; }
+    .comp-cell.comp-feature { background:#0E1322;font-weight:500;font-size:14px;color:#F0F2F8;line-height:1.45; }
+    .comp-cell.comp-feature .feat-icon { font-size:18px;margin-bottom:4px; }
+    .comp-col-label { font-size:15px;font-weight:700;letter-spacing:0.02em; }
+    .comp-col-label.chatgpt { color:#9BA3BF; }
+    .comp-col-label.rumbo { color:#22E06A; }
+    .comp-col-sublabel { font-size:12px;color:#5E6580;margin-top:2px; }
+    .comp-status { display:inline-flex;align-items:center;gap:8px;font-size:14px;line-height:1.5; }
+    .comp-status-icon { flex-shrink:0;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700; }
+    .comp-status.yes .comp-status-icon { background:rgba(34,224,106,0.12);color:#22E06A; }
+    .comp-status.no  .comp-status-icon { background:rgba(255,77,106,0.10);color:#FF4D6A; }
+    .comp-status.mid .comp-status-icon { background:rgba(255,184,48,0.10);color:#FFB830; }
+    .comp-status .comp-status-text { color:#9BA3BF;font-size:13px;line-height:1.45; }
+    .comp-cell.comp-rumbo-col { background:linear-gradient(180deg,rgba(34,224,106,0.04) 0%,rgba(34,224,106,0.02) 100%);border-left:1px solid rgba(34,224,106,0.08); }
+    .comp-row.comp-head .comp-cell.comp-rumbo-col { background:rgba(34,224,106,0.05);border-left:1px solid rgba(34,224,106,0.1);border-radius:12px 12px 0 0; }
+    .comp-bottom { text-align:center;margin-top:48px; }
+    .comp-bottom-text { font-size:16px;color:#9BA3BF;margin-bottom:24px;line-height:1.6; }
+    .comp-bottom-text strong { color:#fff;font-weight:700; }
+    .comp-cta-btn { display:inline-flex;align-items:center;gap:10px;background:#22E06A;color:#0B0F1A;font-weight:700;font-size:16px;padding:16px 36px;border:none;border-radius:12px;cursor:pointer;text-decoration:none;box-shadow:0 0 32px rgba(34,224,106,0.25);transition:all 0.25s ease; }
+    .comp-cta-btn:hover { transform:translateY(-2px);box-shadow:0 0 48px rgba(34,224,106,0.35),0 8px 24px rgba(0,0,0,0.3); }
+    @media (max-width: 640px) {
+      .comp-section { padding:40px 16px; }
+      .comp-row { grid-template-columns:1fr;gap:1px;border-radius:10px; }
+      .comp-row.comp-head { display:none; }
+      .comp-cell { padding:16px; }
+      .comp-cell.comp-feature { font-weight:700;font-size:15px;color:#fff;padding-bottom:8px; }
+      .comp-cell.comp-chatgpt-col::before { display:block;content:'ChatGPT';font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5E6580;margin-bottom:8px; }
+      .comp-cell.comp-rumbo-col::before { display:block;content:'Rumbo';font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#22E06A;margin-bottom:8px; }
+      .comp-cell.comp-rumbo-col { border-left:none;border-top:1px solid rgba(34,224,106,0.08); }
+    }
+  </style>
+  <div class="comp-section">
+    <div class="comp-header">
+      <div class="comp-badge">⚡ La verdad sobre tu CV</div>
+      <h2>"Pero esto lo hago<br>con <span>ChatGPT</span>..."</h2>
+      <p class="comp-subtitle">No es lo mismo escribir un texto que conseguir entrevistas. Mirá la diferencia real.</p>
+    </div>
+    <div class="comp-grid">
+      <div class="comp-row comp-head">
+        <div class="comp-cell comp-feature"></div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-col-label chatgpt">ChatGPT</div><div class="comp-col-sublabel">Generador de texto</div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-col-label rumbo">Rumbo ✦</div><div class="comp-col-sublabel">Optimizador profesional</div></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell comp-feature"><span class="feat-icon">🤖</span>Pasa filtros ATS</div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-status no"><div class="comp-status-icon">✕</div><span class="comp-status-text">No sabe qué ATS existen ni cómo parsean</span></div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-status yes"><div class="comp-status-icon">✓</div><span class="comp-status-text">Optimizado para los ATS más usados en LATAM</span></div></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell comp-feature"><span class="feat-icon">📄</span>Formato profesional</div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-status no"><div class="comp-status-icon">✕</div><span class="comp-status-text">Te da texto plano. El formato lo resolvés vos</span></div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-status yes"><div class="comp-status-icon">✓</div><span class="comp-status-text">CV listo para descargar, con diseño ATS-friendly</span></div></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell comp-feature"><span class="feat-icon">🔑</span>Keywords de la industria</div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-status mid"><div class="comp-status-icon">~</div><span class="comp-status-text">Genéricas. No analiza ofertas reales del mercado</span></div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-status yes"><div class="comp-status-icon">✓</div><span class="comp-status-text">Basadas en ofertas reales de tu industria y país</span></div></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell comp-feature"><span class="feat-icon">🎯</span>Logros cuantificables</div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-status mid"><div class="comp-status-icon">~</div><span class="comp-status-text">Inventa métricas si no le das datos concretos</span></div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-status yes"><div class="comp-status-icon">✓</div><span class="comp-status-text">Te guía para extraer logros reales de tu experiencia</span></div></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell comp-feature"><span class="feat-icon">🌎</span>Contexto LATAM</div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-status no"><div class="comp-status-icon">✕</div><span class="comp-status-text">Piensa en inglés. No entiende nuestro mercado</span></div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-status yes"><div class="comp-status-icon">✓</div><span class="comp-status-text">Hecho para Argentina, México y LATAM</span></div></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell comp-feature"><span class="feat-icon">📊</span>Score de tu CV</div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-status no"><div class="comp-status-icon">✕</div><span class="comp-status-text">No analiza. Solo escribe lo que le pedís</span></div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-status yes"><div class="comp-status-icon">✓</div><span class="comp-status-text">Diagnóstico con puntaje y plan de mejora concreto</span></div></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell comp-feature"><span class="feat-icon">⏱️</span>Tiempo necesario</div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-status no"><div class="comp-status-icon">✕</div><span class="comp-status-text">Horas de ida y vuelta con prompts, sin garantías</span></div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-status yes"><div class="comp-status-icon">✓</div><span class="comp-status-text">CV optimizado en 24hs. Vos seguí buscando trabajo</span></div></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-cell comp-feature"><span class="feat-icon">🛡️</span>Resultado garantizado</div>
+        <div class="comp-cell comp-chatgpt-col"><div class="comp-status no"><div class="comp-status-icon">✕</div><span class="comp-status-text">Cero responsabilidad. Si no funciona, mala suerte</span></div></div>
+        <div class="comp-cell comp-rumbo-col"><div class="comp-status yes"><div class="comp-status-icon">✓</div><span class="comp-status-text">Es revisado por un profesional calificado</span></div></div>
+      </div>
+    </div>
+    <div class="comp-bottom">
+      <p class="comp-bottom-text">ChatGPT es un generador de texto. <strong>Rumbo es un sistema para conseguir entrevistas.</strong><br>La diferencia la ves cuando suena el teléfono.</p>
+      <a href="#upload-zone" class="comp-cta-btn">
+        Optimizá tu CV ahora
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+  </section>
+
+
   <!-- ===================== UPLOAD ZONE ===================== -->
   <section class="upload-section" id="upload-zone">
     <div class="inner">
       <span class="section-label">Probalo ahora</span>
       <h2>Sabé tu puntaje en 30 segundos</h2>
-      <p class="upload-sub">Gratis. Sin registro. Sin tarjeta de crédito. — <button onclick="openDemoModal()" style="background:none;border:none;color:var(--green);font:inherit;font-size:0.875rem;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:0">Ver ejemplo de resultado</button></p>
+      <p class="upload-sub">Tu puntaje, gratis. Por qué no te llaman, desde $19.990.</p>
 
       <div class="dropzone r" id="dropzone"
            ondragover="dzDragOver(event)"
@@ -2625,9 +2598,42 @@
             maxlength="120"
             onkeydown="if(event.key==='Enter') dzAnalyzarConPuesto()"
           >
+          <div id="puesto-error" style="display:none;font-size:12px;color:#ef4444;margin-top:-8px">Por favor ingresá el puesto al que estás aplicando.</div>
           <div class="dz-asking-btns">
             <button class="dz-asking-btn-primary" onclick="dzAnalyzarConPuesto()">Analizar para este puesto</button>
-            <button class="dz-asking-btn-secondary" onclick="dzAnalyzarSinPuesto()">Evaluar según lo que hay en mi CV</button>
+          </div>
+        </div>
+
+        <!-- Estado: situación laboral -->
+        <div class="dz-situation">
+          <div class="dz-asking-title">¿En qué situación estás?</div>
+          <p class="dz-asking-sub">Esto nos ayuda a personalizar el análisis.</p>
+          <div class="dz-asking-btns" style="flex-direction:column;width:100%;max-width:340px;gap:10px">
+            <button class="dz-asking-btn-primary" onclick="dzSetSituacion('Quiero cambiar')">Quiero cambiar de trabajo</button>
+            <button class="dz-asking-btn-primary" onclick="dzSetSituacion('Primer empleo')">Estoy buscando mi primer empleo</button>
+            <button class="dz-asking-btn-primary" onclick="dzSetSituacion('Desempleado')">Estoy desempleado/a</button>
+            <button class="dz-asking-btn-primary" onclick="dzSetSituacion('Remoto/exterior')">Busco trabajo remoto o en el exterior</button>
+          </div>
+        </div>
+
+        <!-- Estado: email para recibir novedades -->
+        <div class="dz-email">
+          <div style="font-size:28px;line-height:1">🔍</div>
+          <div class="dz-asking-title" style="text-align:center">¿Querés saber cómo funcionan los filtros que descartan tu CV?</div>
+          <p class="dz-asking-sub" style="text-align:center;max-width:320px">Dejá tu correo y te contamos cómo los sistemas de selección toman decisiones, qué buscan y cómo posicionarte mejor.</p>
+          <input
+            type="email"
+            class="dz-asking-input"
+            id="email-input"
+            placeholder="tu@correo.com"
+            maxlength="254"
+            autocomplete="email"
+            onkeydown="if(event.key==='Enter') dzSubmitEmail()"
+          >
+          <div id="email-error" style="display:none;font-size:12px;color:#ef4444;margin-top:-8px;text-align:center"></div>
+          <div class="dz-asking-btns" style="flex-direction:column;width:100%;max-width:320px;gap:10px">
+            <button class="dz-asking-btn-primary" onclick="dzSubmitEmail()">Registrame →</button>
+            <button onclick="dzSkipEmail()" style="background:none;border:none;padding:4px 8px;font-size:12px;color:#6b7280;cursor:pointer;font-family:inherit">Continuar sin correo</button>
           </div>
         </div>
 
@@ -2690,8 +2696,8 @@
 
           <!-- Paywall CTA -->
           <div class="dz-paywall">
-            <a href="#oferta" class="btn" style="width:100%;justify-content:center;" onclick="document.getElementById('oferta').style.display='';document.getElementById('oferta').scrollIntoView({behavior:'smooth'})">
-              Desbloquear análisis completo — $39.990
+            <a href="#oferta" class="btn" style="width:100%;justify-content:center;" onclick="document.getElementById('oferta').style.display='';document.getElementById('oferta').scrollIntoView({behavior:'smooth'});startModalTimer()">
+              Desbloquear análisis completo — $19.990
             </a>
             <p class="dz-paywall-note">Incluye <strong>CV reescrito y optimizado</strong> entregado en 24 horas</p>
           </div>
@@ -2707,7 +2713,12 @@
   <section class="oferta" id="oferta" style="display:none">
     <div class="inner">
       <span class="section-label">Desbloqueá tu diagnóstico</span>
-      <h2>Los 12 errores + tu CV nuevo <span class="price">por $39.990</span></h2>
+      <div class="pm-timer" id="pm-timer-oferta">
+        <span class="pm-timer-icon">⏱</span>
+        <span class="pm-timer-text">Oferta 50% válida por:</span>
+        <span class="pm-timer-count" id="timer-count-oferta">05:00</span>
+      </div>
+      <h2>Los 12 errores + tu CV nuevo <span class="price">por $29.990</span></h2>
       <p style="font-size:0.9375rem;color:var(--gray-ui);margin-top:-1rem;margin-bottom:var(--space-xl);">Menos que una foto de perfil profesional. Más impacto en tu búsqueda de trabajo.</p>
 
       <div class="oferta-layout">
@@ -2739,7 +2750,7 @@
 
         <div style="margin-top:var(--space-lg);">
           <a href="#" class="btn" style="width:100%;justify-content:center;">
-            Quiero mi CV optimizado — $39.990
+            Quiero mi CV optimizado — $29.990
           </a>
           <p style="font-size:0.8125rem;color:rgba(255,255,255,0.4);text-align:center;margin-top:0.75rem;">El análisis gratis ya lo tenés. Este es el siguiente paso.</p>
         </div>
@@ -2751,7 +2762,7 @@
             </div>
             <div>
               <div class="upsell-title">Agregá el Kit de Aplicación</div>
-              <div class="upsell-price">+ $14.990</div>
+              <div class="upsell-price">+ $29.990</div>
             </div>
           </div>
           <div class="upsell-divider"></div>
@@ -2963,122 +2974,198 @@
       </div>
       <div class="footer-right">
         <a href="mailto:hola@rumbo.la" class="footer-mail">hola@rumbo.la</a>
+        <div class="footer-loc">¿Tenés una consulta? Escribinos a <a href="https://instagram.com/rumbo.cv" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none;font-weight:600;">@rumbo.cv</a></div>
         <div class="footer-loc">Buenos Aires, Argentina</div>
       </div>
     </div>
   </footer>
 
 
+  <!-- ===================== SHARE POPUP (score >= 70) ===================== -->
+  <div id="share-popup" onclick="handleSharePopupOverlay(event)">
+    <div class="sp-card">
+      <div class="sp-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+        ATS-READY
+      </div>
+      <div class="sp-score-wrap">
+        <span id="sp-score-num" class="sp-score-big">--</span>
+        <span class="sp-score-of">/100</span>
+      </div>
+      <div class="sp-title">¡Tu CV pasa los filtros ATS!</div>
+      <div class="sp-score-line">Tu CV tiene lo necesario para superar los sistemas automáticos y llegar a manos humanas. La mayoría no llega tan lejos.</div>
+      <div class="sp-divider"></div>
+      <div class="sp-refer-label">¿Conocés a alguien buscando trabajo?</div>
+      <div class="sp-refer-sub">Pasale esta herramienta. Es gratis, tarda 30 segundos y puede cambiarle el resultado.</div>
+      <div class="sp-btns">
+        <button class="sp-btn-wa" onclick="spShareWhatsApp()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+          Compartir por WhatsApp
+        </button>
+        <button class="sp-btn-copy" id="sp-copy-btn" onclick="spCopyLink(this)">
+          🔗 Copiar link
+        </button>
+      </div>
+      <button class="sp-skip" onclick="closeSharePopup()">Ver mi análisis completo →</button>
+    </div>
+  </div>
+
   <!-- ===================== MODAL — Analysis result ===================== -->
   <!-- Full-screen overlay, shown after CV analysis completes -->
-  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading"
-       onclick="handleModalOverlayClick(event)">
+  <div id="modal" role="dialog" aria-modal="true" onclick="handleModalOverlayClick(event)">
     <div class="modal-card" id="modal-card">
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
 
-      <!-- Close button -->
-      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">
-        <svg viewBox="0 0 12 12">
-          <path d="M1 1l10 10M11 1L1 11"/>
-        </svg>
-      </button>
-
-      <!-- Score -->
-      <div class="modal-score-row">
-        <div class="modal-score-num" id="modal-score-num">0</div>
-        <div class="modal-score-of">/100</div>
-        <div class="modal-score-nivel" id="modal-score-nivel">Muy bajo</div>
-      </div>
-      <div class="modal-score-context">Los CVs que consiguen entrevistas puntúan por encima de 75.</div>
-
-      <!-- Problemas visibles (hasta 3) -->
-      <div class="modal-problems" id="modal-problems"></div>
-
-      <!-- Lock: problemas restantes -->
-      <div class="modal-problem-more" id="modal-problem-more">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span id="modal-locked-count">+N problemas más bloqueados</span>
+      <!-- Header con score ring -->
+      <div class="pm-header" id="pm-header-default">
+        <div class="pm-score-ring">
+          <svg viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#F0F2F6" stroke-width="6"/>
+            <circle id="modal-score-ring" cx="40" cy="40" r="34" fill="none" stroke="#EF4444" stroke-width="6"
+              stroke-dasharray="213.6" stroke-dashoffset="213.6"
+              stroke-linecap="round" transform="rotate(-90 40 40)"/>
+          </svg>
+          <span class="pm-score-number" id="modal-score-num">0</span>
+          <span class="pm-score-of">/100</span>
+        </div>
+        <div class="pm-score-nivel" id="modal-score-nivel">Muy bajo</div>
+        <h2>Tu CV tiene problemas que no estás viendo</h2>
+        <p class="pm-header-sub" id="modal-pricing-header">Con este puntaje, tu CV es descartado antes de que un humano lo lea.</p>
       </div>
 
-      <!-- Pain line -->
-      <div class="modal-pain-line">Con este score, tu CV es descartado automáticamente antes de que un humano lo vea.</div>
-
-      <!-- Pricing header dinámico -->
-      <div class="modal-pricing-header" id="modal-pricing-header">
-        Tu CV tiene <strong>problemas</strong> que te están costando entrevistas. Elegí cómo resolverlos.
-      </div>
-
-      <!-- Countdown timer -->
-      <div class="modal-timer">
-        <span>⚠️ Esta oferta expira en</span>
-        <span class="modal-timer-count" id="modal-timer-count">05:00</span>
-      </div>
-
-      <!-- Pricing tiers -->
-      <div class="modal-tiers">
-
-        <!-- Tier 1: CV Listo Para Enviar (featured) -->
-        <div class="modal-tier modal-tier--featured">
-          <div class="modal-tier-badge">más elegido</div>
-          <div class="modal-tier-name">CV Listo Para Enviar</div>
-          <div class="modal-tier-price-row">
-            <span class="modal-tier-price">$34.990</span>
-            <span class="modal-tier-price-anchor">$54.990</span>
-            <span class="modal-tier-discount">−36%</span>
+      <!-- Header para score >= 70 -->
+      <div class="pm-header pm-header-good" id="pm-header-good" style="display:none">
+        <div class="pm-score-ring">
+          <svg viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#F0F2F6" stroke-width="6"/>
+            <circle id="modal-score-ring-good" cx="40" cy="40" r="34" fill="none" stroke="#10B981" stroke-width="6"
+              stroke-dasharray="213.6" stroke-dashoffset="213.6"
+              stroke-linecap="round" transform="rotate(-90 40 40)"/>
+          </svg>
+          <span class="pm-score-number" id="modal-score-num-good" style="color:#10B981">0</span>
+          <span class="pm-score-of">/100</span>
+        </div>
+        <div class="pm-score-nivel" id="modal-score-nivel-good" style="color:#10B981;background:#ECFDF5;border-color:#10B98133">Bien visto</div>
+        <h2>Tu CV pasa los filtros</h2>
+        <p class="pm-header-sub">Este puntaje indica que tu CV puede pasar los sistemas de selección. ¿Conocés a alguien que necesite ayuda?</p>
+        <div class="pm-share-box">
+          <div class="pm-share-label">Compartilo con quien lo necesite</div>
+          <div class="pm-share-links">
+            <a href="#" class="pm-share-btn" id="share-wa" onclick="shareWhatsApp(event)">WhatsApp</a>
+            <a href="#" class="pm-share-btn" id="share-fb" onclick="shareFacebook(event)">Facebook</a>
+            <a href="#" class="pm-share-btn" id="share-copy" onclick="copyLink(event)">Copiar link</a>
           </div>
-          <ul class="modal-tier-features">
-            <li>✅ Informe completo con todos los errores</li>
-            <li>✅ CV reescrito por especialista ATS</li>
-            <li>✅ Keywords del sector integradas</li>
-            <li>✅ Optimizado para el puesto que buscás</li>
-            <li>✅ Entregado en 24hs</li>
-            <li>✅ Garantía de devolución 7 días</li>
-          </ul>
-          <button class="modal-tier-btn modal-tier-btn--primary"
-                  id="btn-cv"
-                  onclick="initiatePayment('cv')">
-            Quiero mi CV nuevo
-          </button>
-          <div class="modal-tier-note">Pago único. Sin suscripción. Sin sorpresas.</div>
         </div>
+      </div>
 
-        <!-- Tier 2: Solo el Informe -->
-        <div class="modal-tier">
-          <div class="modal-tier-name">Solo el Informe</div>
-          <div class="modal-tier-price-row">
-            <span class="modal-tier-price">$19.990</span>
-            <span class="modal-tier-price-anchor">$24.990</span>
-            <span class="modal-tier-discount">−20%</span>
+      <!-- Findings -->
+      <div class="pm-findings">
+        <div class="pm-findings-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+          Detectado en tu CV
+        </div>
+        <div id="modal-problems"></div>
+        <div id="modal-problem-more" class="pm-locked-row">
+          <div class="pm-finding-icon warn">🔒</div>
+          <span class="pm-locked-text">Palabras clave faltantes · Errores de formato · Secciones ocultas</span>
+          <span class="pm-lock-badge" id="modal-locked-count">+N más</span>
+        </div>
+      </div>
+
+
+
+      <!-- CTAs -->
+      <div class="pm-ctas" id="modal-locked-wrap">
+        <div class="pm-timer" id="pm-timer">
+          <span class="pm-timer-icon">⏱</span>
+          <span class="pm-timer-text">Oferta 50% válida por:</span>
+          <span class="pm-timer-count" id="timer-count">05:00</span>
+        </div>
+        <div class="modal-tiers">
+
+          <!-- CV featured -->
+          <div class="pm-card featured">
+            <div class="pm-guarantee"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><path d="M12 22c5.5-2 9-6.5 9-11V5l-9-3-9 3v6c0 4.5 3.5 9 9 11z"/><path d="M9 12l2 2 4-4"/></svg> Si tu CV no supera los 70 puntos, te devolvemos tu dinero.</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;background:#EEF4FF;border:1px solid #D6E4FF;border-radius:7px;padding:5px 10px;margin-bottom:10px;font-size:10.5px;font-weight:600;color:#2D6AE0">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2D6AE0" stroke-width="2.5" stroke-linecap="round"><path d="M12 22c5.5-2 9-6.5 9-11V5l-9-3-9 3v6c0 4.5 3.5 9 9 11z"/><path d="M9 12l2 2 4-4"/></svg>
+              Pago seguro con Mercado Pago
+            </div>
+            <span class="pm-popular">50% DESCUENTO</span>
+            <div class="pm-card-top">
+              <div class="pm-card-title">CV Listo Para Enviar</div>
+              <div class="pm-pricing">
+                <span class="pm-price-old">$59.990</span>
+                <span class="pm-price-current">$29.990</span>
+              </div>
+            </div>
+            <ul class="pm-features">
+              <li><span class="pm-check">✓</span>Entregado en 24hs</li>
+              <li><span class="pm-check">✓</span>Informe completo con todos los errores</li>
+              <li><span class="pm-check">✓</span>CV reescrito por especialista en selección</li>
+              <li><span class="pm-check">✓</span>Palabras clave del sector integradas</li>
+              <li><span class="pm-check">✓</span>Optimizado para el puesto que buscás</li>
+            </ul>
+            <button class="pm-btn primary" id="btn-cv" onclick="initiatePayment('cv')">QUIERO MI CV NUEVO</button>
+            <p style="font-size:12px;color:#9198AD;text-align:center;margin-top:8px;margin-bottom:0">Al costo de dos almuerzos, dejás de mandar CVs que nadie lee.</p>
           </div>
-          <ul class="modal-tier-features">
-            <li>✅ Todos los errores desbloqueados</li>
-            <li>✅ Keywords faltantes</li>
-            <li>✅ Instrucciones para corregirlo vos mismo</li>
-            <li class="feat-no">❌ CV no reescrito</li>
-          </ul>
-          <button class="modal-tier-btn modal-tier-btn--secondary"
-                  id="btn-informe"
-                  onclick="initiatePayment('informe')">
-            Ver informe completo
-          </button>
-          <div class="modal-tier-note">Pago único. Sin suscripción.</div>
-        </div>
 
-      </div>
+          <!-- Solo informe -->
+          <div class="pm-card">
+            <div class="pm-card-top">
+              <div class="pm-card-title">Solo el Informe</div>
+              <div class="pm-pricing">
+                <span class="pm-price-old">$39.990</span>
+                <span class="pm-price-current">$19.990</span>
+              </div>
+            </div>
+            <ul class="pm-features">
+              <li><span class="pm-check">✓</span>Todos los errores desbloqueados</li>
+              <li><span class="pm-check">✓</span>Palabras clave faltantes de tu industria</li>
+              <li><span class="pm-check">✓</span>Análisis de compatibilidad de filtros</li>
+              <li><span class="pm-check">✓</span>Instrucciones paso a paso para corregirlo vos mismo</li>
+              <li><span class="pm-cross">✕</span><span style="color:#9198AD">El informe te dice qué corregir. Vos lo aplicás.</span></li>
+            </ul>
+            <button class="pm-btn secondary" id="btn-informe" onclick="initiatePayment('informe')">QUIERO SABER POR QUÉ NO ME LLAMAN</button>
+            <p style="font-size:12px;color:#9198AD;text-align:center;margin-top:8px;margin-bottom:0">Al costo de un almuerzo, sabés exactamente por qué tu CV no funciona.</p>
+          </div>
 
-      <!-- Social proof -->
-      <div class="modal-social-proof">847 personas mejoraron su CV esta semana con Rumbo.</div>
-
-      <!-- Cara humana -->
-      <div class="modal-human">
-        <div class="modal-human-avatar">VR</div>
-        <div>
-          <div class="modal-human-name">Valentina Rodríguez</div>
-          <div class="modal-human-bio">Cada CV es revisado por Valentina, especialista en reclutamiento con 8 años de experiencia en LATAM.</div>
         </div>
       </div>
 
-      <!-- Costo de no actuar -->
-      <div class="modal-cost-line">El candidato promedio manda 47 CVs antes de conseguir una entrevista. Con un CV optimizado, ese número baja a 8.</div>
+      <!-- Testimonios -->
+      <div class="pm-testimonials">
+        <div class="pm-tests-label">Resultados reales</div>
+        <div class="pm-test">
+          <div style="display:flex;gap:8px;margin-bottom:10px;font-size:11.5px">
+            <div style="flex:1;background:#fef2f2;border-radius:6px;padding:6px 10px;color:#991b1b"><span style="font-weight:700;display:block;margin-bottom:2px">Antes</span>40 CVs enviados. 0 respuestas. 3 meses.</div>
+            <div style="flex:1;background:#f0fdf4;border-radius:6px;padding:6px 10px;color:#15803d"><span style="font-weight:700;display:block;margin-bottom:2px">7 días después</span>3 empresas llamaron en la primera semana.</div>
+          </div>
+          <div class="pm-test-text">"No entendía qué estaba haciendo mal. El informe me mostró exactamente por qué me descartaban."</div>
+          <div class="pm-test-author">
+            <div class="pm-test-avatar">ML</div>
+            <div><div class="pm-test-name">Martín L.</div><div class="pm-test-role">Analista de datos — Buenos Aires</div></div>
+            <div class="pm-test-stars">★★★★★</div>
+          </div>
+        </div>
+        <div class="pm-test" style="margin-top:8px">
+          <div style="display:flex;gap:8px;margin-bottom:10px;font-size:11.5px">
+            <div style="flex:1;background:#fef2f2;border-radius:6px;padding:6px 10px;color:#991b1b"><span style="font-weight:700;display:block;margin-bottom:2px">Antes</span>CV con tablas y columnas. Invisible para los filtros.</div>
+            <div style="flex:1;background:#f0fdf4;border-radius:6px;padding:6px 10px;color:#15803d"><span style="font-weight:700;display:block;margin-bottom:2px">12 días después</span>CV nuevo entregado. Primera entrevista en 4 días.</div>
+          </div>
+          <div class="pm-test-text">"Lo corregí con las instrucciones paso a paso. Más simple de lo que pensaba."</div>
+          <div class="pm-test-author">
+            <div class="pm-test-avatar">VS</div>
+            <div><div class="pm-test-name">Valentina S.</div><div class="pm-test-role">Diseñadora UX — Córdoba</div></div>
+            <div class="pm-test-stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer MP + skip -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:0 20px 20px;color:#9198AD;font-size:11px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9198AD" stroke-width="2" stroke-linecap="round"><path d="M12 22c5.5-2 9-6.5 9-11V5l-9-3-9 3v6c0 4.5 3.5 9 9 11z"/><path d="M9 12l2 2 4-4"/></svg>
+        Pago seguro con Mercado Pago
+      </div>
 
     </div>
   </div>
@@ -3106,13 +3193,51 @@
     // -----------------------------------------------
     const API_URL = 'https://rumbo-six.vercel.app';
 
-    // Track page visit (CAPI PageView)
-    fetch(`${API_URL}/api/track/visit`, { method: 'POST' })
-      .then(() => console.log('%c[CAPI] PageView fired', 'color: #1877F2; font-weight: bold'))
-      .catch(err => console.warn('[CAPI] PageView error:', err));
-
     // Session ID returned by the backend after analysis
     let currentSession = null;
+
+    const DEMO_KEY = typeof window.__DEMO_KEY__ !== 'undefined' ? window.__DEMO_KEY__ : null;
+
+    // -----------------------------------------------
+    // fbc helper — read or create from fbclid param
+    // -----------------------------------------------
+    function getFbc() {
+      // Try existing cookie first
+      const fromCookie = document.cookie.match(/_fbc=([^;]+)/)?.[1];
+      if (fromCookie) return fromCookie;
+      // Build from fbclid URL param (Meta format: fb.1.<ts>.<fbclid>)
+      const fbclid = new URLSearchParams(window.location.search).get('fbclid');
+      if (!fbclid) return null;
+      const fbc = `fb.1.${Math.round(Date.now() / 1000)}.${fbclid}`;
+      // Store as cookie for subsequent requests (90-day expiry)
+      const exp = new Date(Date.now() + 90 * 86400000).toUTCString();
+      document.cookie = `_fbc=${fbc};expires=${exp};path=/;SameSite=Lax`;
+      return fbc;
+    }
+    function getFbp() { return document.cookie.match(/_fbp=([^;]+)/)?.[1] || null; }
+
+    // -----------------------------------------------
+    // UTM capture & forward to backend
+    // -----------------------------------------------
+    (function captureUTM() {
+      const p = new URLSearchParams(window.location.search);
+      const utm = p.get('utm_source') ? {
+        source:   p.get('utm_source'),
+        medium:   p.get('utm_medium')   || null,
+        campaign: p.get('utm_campaign') || null,
+      } : null;
+      if (utm) sessionStorage.setItem('rumbo_utm', JSON.stringify(utm));
+      if (!DEMO_KEY) fetch(`${API_URL}/api/track/visit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ utm: utm || {}, fbp: getFbp(), fbc: getFbc(), eventId: window._pvEventId }),
+      }).catch(() => {});
+    })();
+
+    function getUTM() {
+      try { return JSON.parse(sessionStorage.getItem('rumbo_utm')); }
+      catch(e) { return null; }
+    }
 
     // -----------------------------------------------
     // FAQ accordion — one open at a time
@@ -3208,52 +3333,110 @@
       const file = e.dataTransfer?.files[0];
       if (file) dzShowAsking(file);
     }
-    async function computeHash(file) {
-      try {
-        const buf = await file.arrayBuffer();
-        const hash = await crypto.subtle.digest('SHA-256', buf);
-        return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
-      } catch { return null; }
+    function dzFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) dzShowAsking(file);
     }
 
-    async function dzFileSelect(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      // Check if same file was already analyzed
-      const raw = localStorage.getItem('rumbo_session');
-      if (raw) {
-        try {
-          const saved = JSON.parse(raw);
-          if (saved.fileHash) {
-            const hash = await computeHash(file);
-            if (hash && hash === saved.fileHash) {
-              showError('Este CV ya fue analizado. Tus resultados siguen activos.');
-              return;
-            }
-          }
-        } catch {}
-      }
-
-      dzShowAsking(file);
+    function fileFingerprint(file) {
+      return `${file.name}|${file.size}|${file.lastModified}`;
     }
 
     function dzShowAsking(file) {
+      // Block re-analysis of same file
+      const fp = fileFingerprint(file);
+      try {
+        const storedFp      = localStorage.getItem('rumbo_file_fp');
+        const storedPartial = localStorage.getItem('rumbo_partial');
+        if (storedFp === fp && storedPartial) {
+          const partial = JSON.parse(storedPartial);
+          currentSession = partial.sessionId;
+          openModal(partial);
+          return;
+        }
+      } catch(e) {}
+
+      localStorage.setItem('rumbo_file_fp', fp);
       pendingFile = file;
       dropzone.classList.add('asking');
       const input = document.getElementById('puesto-input');
       if (input) { input.value = ''; setTimeout(() => input.focus(), 100); }
     }
 
+    let pendingPuesto = null;
+
     function dzAnalyzarConPuesto() {
       const puesto = (document.getElementById('puesto-input')?.value || '').trim();
+      if (!puesto) {
+        const err = document.getElementById('puesto-error');
+        if (err) { err.style.display = 'block'; setTimeout(() => err.style.display = 'none', 3000); }
+        document.getElementById('puesto-input')?.focus();
+        return;
+      }
+      pendingPuesto = puesto;
       dropzone.classList.remove('asking');
-      handleFile(pendingFile, puesto || null);
+      dropzone.classList.add('situating');
     }
 
     function dzAnalyzarSinPuesto() {
+      pendingPuesto = null;
       dropzone.classList.remove('asking');
-      handleFile(pendingFile, null);
+      dropzone.classList.add('situating');
+    }
+
+    let pendingSituacion = null;
+
+    function dzSetSituacion(situacion) {
+      pendingSituacion = situacion;
+      dropzone.classList.remove('situating');
+      dropzone.classList.add('emailing');
+      const input = document.getElementById('email-input');
+      if (input) { input.value = ''; setTimeout(() => input.focus(), 100); }
+    }
+
+    const DISPOSABLE_DOMAINS = new Set([
+      'mailinator.com','guerrillamail.com','guerrillamail.net','guerrillamail.org',
+      'guerrillamail.biz','guerrillamail.de','guerrillamail.info','spam4.me',
+      'tempmail.com','temp-mail.org','throwam.com','sharklasers.com','yopmail.com',
+      'yopmail.fr','trashmail.com','trashmail.me','trashmail.net','trashmail.at',
+      'trashmail.io','trashmail.org','dispostable.com','mailnull.com','maildrop.cc',
+      '10minutemail.com','10minutemail.net','fakeinbox.com','fakeinbox.net',
+      'mailexpire.com','tempr.email','discard.email','mailnesia.com',
+    ]);
+
+    function isValidEmail(email) {
+      if (!email || email.length > 254) return false;
+      const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+      if (!re.test(email)) return false;
+      const domain = email.split('@')[1].toLowerCase();
+      if (DISPOSABLE_DOMAINS.has(domain)) return false;
+      return true;
+    }
+
+    function dzSubmitEmail() {
+      const input = document.getElementById('email-input');
+      const errEl = document.getElementById('email-error');
+      const raw   = (input?.value || '').trim().toLowerCase();
+
+      if (!isValidEmail(raw)) {
+        if (errEl) {
+          errEl.textContent = raw.includes('@')
+            ? 'Ingresá un correo real al que tengas acceso.'
+            : 'Ingresá un correo electrónico válido.';
+          errEl.style.display = 'block';
+          setTimeout(() => { errEl.style.display = 'none'; }, 4000);
+        }
+        input?.focus();
+        return;
+      }
+
+      dropzone.classList.remove('emailing');
+      handleFile(pendingFile, pendingPuesto, pendingSituacion, raw);
+    }
+
+    function dzSkipEmail() {
+      dropzone.classList.remove('emailing');
+      handleFile(pendingFile, pendingPuesto, pendingSituacion, null);
     }
 
     // Show a red error message below the dropzone content
@@ -3269,7 +3452,7 @@
     // -----------------------------------------------
     // handleFile — real API call (replaces fake timeout)
     // -----------------------------------------------
-    async function handleFile(file, puesto) {
+    async function handleFile(file, puesto, situacion, email) {
       // Hide any previous error
       const errEl = document.getElementById('dz-error-msg');
       if (errEl) errEl.classList.remove('visible');
@@ -3278,24 +3461,21 @@
       startLoadingAnimation();
 
       try {
-        // Fire Lead on upload — before analysis starts
-        fbq('track', 'Lead');
-        console.log('%c[Pixel] Lead fired', 'color: #1877F2; font-weight: bold');
-
         const formData = new FormData();
         formData.append('cv', file);
-        if (puesto) formData.append('puesto', puesto);
-
+        if (puesto)    formData.append('puesto',    puesto);
+        if (situacion) formData.append('situacion', situacion);
+        if (email)     formData.append('email',     email);
+        if (DEMO_KEY)  formData.append('demo_key',  DEMO_KEY);
         const res  = await fetch(`${API_URL}/api/analyze`, { method: 'POST', body: formData });
         const data = await res.json();
 
         if (!data.ok) throw new Error(data.error || 'Error al analizar el CV.');
-        console.log('%c[CAPI] Lead fired', 'color: #1877F2; font-weight: bold');
 
         // Store session for payment
         currentSession = data.partial.sessionId;
-        const fileHash = await computeHash(file);
-        localStorage.setItem('rumbo_session', JSON.stringify({ sessionId: data.partial.sessionId, partial: data.partial, fileHash, ts: Date.now() }));
+        localStorage.setItem('rumbo_partial', JSON.stringify(data.partial));
+        activatePaywallCTAs();
 
         // Show result state in dropzone
         stopLoadingAnimation();
@@ -3375,20 +3555,98 @@
     let timerInterval = null;
 
     function startModalTimer() {
-      const el = document.getElementById('modal-timer-count');
-      if (!el) return;
+      const modalEl = document.getElementById('modal-timer-count');
+      const offerEl = document.getElementById('timer-count');
+      const ofertaEl = document.getElementById('timer-count-oferta');
+      if (!modalEl && !offerEl && !ofertaEl) return;
       if (timerInterval) clearInterval(timerInterval);
       const end = Date.now() + 5 * 60 * 1000;
       function tick() {
         const rem = Math.max(0, end - Date.now());
         const m = Math.floor(rem / 60000);
         const s = Math.floor((rem % 60000) / 1000);
-        el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        el.style.color = rem <= 60000 ? '#FF4F4F' : 'var(--navy)';
+        const timeStr = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        if (modalEl) {
+          modalEl.textContent = timeStr;
+          modalEl.style.color = rem <= 60000 ? '#FF4F4F' : 'var(--navy)';
+        }
+        if (offerEl) {
+          offerEl.textContent = timeStr;
+          offerEl.style.color = rem <= 60000 ? '#DC2626' : '#B45309';
+        }
+        if (ofertaEl) {
+          ofertaEl.textContent = timeStr;
+          ofertaEl.style.color = rem <= 60000 ? '#DC2626' : '#B45309';
+        }
         if (rem <= 0) clearInterval(timerInterval);
       }
       tick();
       timerInterval = setInterval(tick, 1000);
+    }
+
+    // -----------------------------------------------
+    // Share functions
+    // -----------------------------------------------
+    function getShareUrl() {
+      return window.location.origin + '?ref=friend';
+    }
+
+    function shareWhatsApp(e) {
+      e.preventDefault();
+      const text = 'Me pasaron este analizador de CV gratis, está muy bueno: ' + getShareUrl();
+      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    }
+
+    function shareFacebook(e) {
+      e.preventDefault();
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(getShareUrl()), '_blank');
+    }
+
+    function copyLink(e) {
+      e.preventDefault();
+      navigator.clipboard.writeText(getShareUrl()).then(() => {
+        const btn = document.getElementById('share-copy');
+        const original = btn.textContent;
+        btn.textContent = 'Copiado!';
+        setTimeout(() => btn.textContent = original, 2000);
+      });
+    }
+
+    // ── Share popup (score >= 70) ─────────────────────────────────
+    function openSharePopup(score) {
+      const popup = document.getElementById('share-popup');
+      const numEl = document.getElementById('sp-score-num');
+      if (numEl) {
+        numEl.textContent = '0';
+        setTimeout(() => countUp(numEl, null, score, 900), 80);
+      }
+      if (popup) popup.classList.add('open');
+    }
+
+    function closeSharePopup() {
+      const popup = document.getElementById('share-popup');
+      if (popup) popup.classList.remove('open');
+    }
+
+    function handleSharePopupOverlay(e) {
+      if (e.target === document.getElementById('share-popup')) closeSharePopup();
+    }
+
+    function spShareWhatsApp() {
+      const url = getShareUrl();
+      const text = 'Hacé el test gratis de ATS para tu CV — en 30 segundos sabés si pasás los filtros automáticos: ' + url;
+      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    }
+
+    function spCopyLink(btn) {
+      navigator.clipboard.writeText(getShareUrl()).then(() => {
+        btn.textContent = '✓ ¡Link copiado!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '🔗 Copiar link';
+          btn.classList.remove('copied');
+        }, 2500);
+      });
     }
 
     // -----------------------------------------------
@@ -3403,17 +3661,53 @@
       if (!modal) return;
 
       const score  = partial.score ?? 0;
+      const isGood = score >= 70;
       const cls    = colorClass(score);
       const clrMap = { low: '#FF4F4F', mid: '#FF9A3C', high: 'var(--green)' };
       const clr    = clrMap[cls];
 
-      // --- Score ---
+      // Show/hide headers based on score
+      const headerDefault = document.getElementById('pm-header-default');
+      const headerGood = document.getElementById('pm-header-good');
+      const ctasWrap = document.getElementById('modal-locked-wrap');
+      if (isGood && headerDefault && headerGood && ctasWrap) {
+        headerDefault.style.display = 'none';
+        headerGood.style.display = 'block';
+        ctasWrap.style.display = 'none';
+        // Animate score ring for good score
+        const ringGood = document.getElementById('modal-score-ring-good');
+        const numGood = document.getElementById('modal-score-num-good');
+        const circumference = 213.6;
+        if (ringGood) {
+          ringGood.style.stroke = '#10B981';
+          const targetOffset = circumference * (1 - score / 100);
+          ringGood.style.transition = 'stroke-dashoffset 1.1s ease';
+          setTimeout(() => { ringGood.style.strokeDashoffset = targetOffset; }, 150);
+        }
+        if (numGood) {
+          setTimeout(() => countUp(numGood, null, score, 1100), 120);
+        }
+      } else if (headerDefault && headerGood && ctasWrap) {
+        headerDefault.style.display = 'block';
+        headerGood.style.display = 'none';
+        ctasWrap.style.display = 'block';
+      }
+
+      // --- Score ring + número ---
       const scoreEl = document.getElementById('modal-score-num');
       const nivelEl = document.getElementById('modal-score-nivel');
+      const ringEl  = document.getElementById('modal-score-ring');
+      const circumference = 213.6;
       if (scoreEl) {
         scoreEl.textContent = '0';
         scoreEl.style.color = clr;
         setTimeout(() => countUp(scoreEl, null, score, 1100), 120);
+      }
+      if (ringEl) {
+        ringEl.style.stroke = clr;
+        const targetOffset = circumference * (1 - score / 100);
+        ringEl.style.transition = 'stroke-dashoffset 1.1s ease';
+        setTimeout(() => { ringEl.style.strokeDashoffset = targetOffset; }, 150);
       }
       if (nivelEl) {
         nivelEl.textContent = partial.nivel || '';
@@ -3423,24 +3717,29 @@
       }
 
       // --- Problemas (hasta 3 del preview) ---
+      const findingsEl = document.querySelector('.pm-findings');
       const problemsEl    = document.getElementById('modal-problems');
       const moreEl        = document.getElementById('modal-problem-more');
       const lockedCountEl = document.getElementById('modal-locked-count');
       const errores = Array.isArray(partial.errores_preview) ? partial.errores_preview : [];
       const total   = partial.errores_total || 0;
 
-      if (problemsEl) {
-        problemsEl.innerHTML = errores.map(e =>
-          `<div class="modal-problem-item">
-            <span class="modal-problem-icon">❌</span>
-            <span class="modal-problem-text">${e.descripcion || ''}</span>
+      if (findingsEl) {
+        findingsEl.style.display = isGood ? 'none' : 'block';
+      }
+
+      if (!isGood && problemsEl) {
+        problemsEl.innerHTML = errores.map((e, i) =>
+          `<div class="pm-finding-item">
+            <div class="pm-finding-icon${i > 0 ? ' warn' : ''}">!</div>
+            <div class="pm-finding-text">${e.descripcion || ''}</div>
           </div>`
         ).join('');
       }
 
       const locked = Math.max(0, total - errores.length);
-      if (moreEl) moreEl.style.display = locked > 0 ? 'flex' : 'none';
-      if (lockedCountEl) lockedCountEl.textContent = `+${locked} problemas más bloqueados`;
+      if (moreEl) moreEl.style.display = (isGood || locked <= 0) ? 'none' : 'flex';
+      if (lockedCountEl) lockedCountEl.textContent = `+${locked} más`;
 
       // --- Pricing header dinámico ---
       const pricingHeaderEl = document.getElementById('modal-pricing-header');
@@ -3454,6 +3753,9 @@
       // --- Show modal ---
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
+
+      // For good scores, show share popup on top after brief delay
+      if (isGood) setTimeout(() => openSharePopup(score), 900);
     }
 
     // Demo modal — lets user preview the UI without uploading
@@ -3476,6 +3778,47 @@
       modal.classList.remove('open');
       document.body.style.overflow = '';
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      // After closing, make sure all CTAs reopen the modal
+      activatePaywallCTAs();
+    }
+
+    function activatePaywallCTAs() {
+      let partial;
+      try { partial = JSON.parse(localStorage.getItem('rumbo_partial')); } catch(e) {}
+      if (!partial) return;
+      currentSession = partial.sessionId;
+
+      // Swap all analyze CTAs
+      document.querySelectorAll('a[href="#upload-zone"], .js-cta-paywall').forEach(function(btn) {
+        if (btn.dataset.paywallActive) return;
+        btn.dataset.paywallActive = '1';
+        btn.textContent = 'Desbloquear mi informe';
+        btn.removeAttribute('href');
+        btn.style.cursor = 'pointer';
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          openModal(partial);
+        });
+      });
+
+      // Lock the dropzone — no new uploads allowed
+      if (dropzone && !dropzone.dataset.locked) {
+        dropzone.dataset.locked = '1';
+        dropzone.style.cursor = 'pointer';
+        // Disable file input
+        const fileInput = document.getElementById('file-input');
+        if (fileInput) fileInput.disabled = true;
+        // Clicking dropzone reopens modal
+        dropzone.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openModal(partial);
+        });
+        // Show unlock message over the dropzone result/default area
+        const dzDefault = dropzone.querySelector('.dz-default');
+        if (dzDefault) {
+          dzDefault.innerHTML = '<div style="text-align:center;padding:1rem"><div style="font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:0.5rem">Tu CV ya fue analizado</div><div style="font-size:0.9rem;color:#6b7280">Desbloqueá el informe para ver todos los errores</div></div>';
+        }
+      }
     }
 
     // Click on the overlay (not the card) closes the modal
@@ -3506,17 +3849,27 @@
       }
 
       try {
+        // Evento client-side InitiateCheckout (Meta Pixel)
+        const _checkoutEventId = 'checkout_' + currentSession + '_' + tier + '_' + Date.now();
+        const _tierPrices = { cv: 29990, informe: 19990 };
+        if (typeof fbq === 'function') {
+          fbq('track', 'InitiateCheckout', {
+            content_name: tier === 'cv' ? 'cv_listo_para_enviar' : 'informe_completo',
+            value:        _tierPrices[tier] || 0,
+            currency:     'ARS',
+            num_items:    1,
+          }, { eventID: _checkoutEventId });
+        }
+
         const res = await fetch(`${API_URL}/api/payment/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: currentSession, tier }),
+          body: JSON.stringify({ sessionId: currentSession, tier, utm: getUTM(), fbp: getFbp(), fbc: getFbc(), eventId: _checkoutEventId }),
         });
         const data = await res.json();
 
         if (data.ok) {
           // Redirect to MercadoPago checkout
-          const saved = JSON.parse(localStorage.getItem('rumbo_session') || '{}');
-          localStorage.setItem('rumbo_session', JSON.stringify({ ...saved, tier }));
           window.location.href = data.checkoutUrl;
         } else {
           alert(data.error || 'No se pudo iniciar el pago. Intentá de nuevo.');
@@ -3536,46 +3889,6 @@
     }
 
     // -----------------------------------------------
-    // Restore session from localStorage (back from MP)
-    // -----------------------------------------------
-    (function restoreSession() {
-      const raw = localStorage.getItem('rumbo_session');
-      if (!raw) return;
-      try {
-        const saved = JSON.parse(raw);
-        const AGE_LIMIT = 48 * 60 * 60 * 1000;
-        if (!saved.sessionId || !saved.partial || (Date.now() - saved.ts) > AGE_LIMIT) {
-          localStorage.removeItem('rumbo_session');
-          return;
-        }
-        currentSession = saved.sessionId;
-
-        // Restore dropzone to done state (hide upload UI)
-        const dz = document.getElementById('dropzone');
-        if (dz) {
-          dz.classList.add('done');
-          const p = saved.partial;
-          const dzScore = document.getElementById('dz-score');
-          if (dzScore) dzScore.textContent = p.score ?? 0;
-          const dzScoreSub = dz.querySelector('.dz-result-score-sub');
-          if (dzScoreSub) dzScoreSub.textContent = `/ 100 — ${p.nivel || ''}`;
-          const dzTitle = dz.querySelector('.dz-result-title');
-          if (dzTitle) dzTitle.textContent = `Tu CV tiene ${p.errores_total || 0} errores críticos`;
-          const dzVisibleErr = dz.querySelector('.dz-err--visible .dz-err-text');
-          if (dzVisibleErr && p.errores_preview?.[0]) dzVisibleErr.textContent = p.errores_preview[0].descripcion || '';
-          const lockOverlay = dz.querySelector('.dz-lock-overlay');
-          if (lockOverlay) {
-            const locked = Math.max(0, (p.errores_total || 0) - 1);
-            lockOverlay.innerHTML = `<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>+${locked} errores más — desbloqueá para verlos todos`;
-          }
-        }
-
-        // Re-open modal after brief pause
-        setTimeout(() => openModal(saved.partial), 400);
-      } catch { localStorage.removeItem('rumbo_session'); }
-    })();
-
-    // -----------------------------------------------
     // Post-payment: handle ?payment=success&session=X
     // Called on page load if redirected back from MP
     // -----------------------------------------------
@@ -3586,15 +3899,16 @@
 
       if (status !== 'success' || !sessionId) return;
 
-      // Clean up URL and localStorage
-      window.history.replaceState({}, '', window.location.pathname);
-      localStorage.removeItem('rumbo_session');
+      // Clean up the URL without reloading the page
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
 
       try {
         const res  = await fetch(`${API_URL}/api/analyze/unlock/${sessionId}`);
         const data = await res.json();
 
         if (data.ok && data.analysis) {
+          localStorage.removeItem('rumbo_partial');
           showSuccessModal(data.analysis, data.tier);
         } else {
           // If not yet marked paid (webhook race condition), show a friendly message
@@ -3604,6 +3918,96 @@
         console.error('[post-payment] Error:', err);
       }
     })();
+
+    // -----------------------------------------------
+    // Pre-populate checkout from email link (?session=xxx)
+    // -----------------------------------------------
+    (function checkSessionFromEmail() {
+      const params    = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session');
+      const status    = params.get('payment');
+
+      console.log('[session-check] sessionId:', sessionId, '| status:', status);
+
+      if (!sessionId || status === 'success') {
+        console.log('[session-check] early return - no session or success');
+        return;
+      }
+
+      fetch(`${API_URL}/api/analyze/session/${sessionId}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log('[session-check] response:', data);
+          
+          if (!data.ok) {
+            console.log('[session-check] not ok, returning');
+            return;
+          }
+
+          if (data.paid) {
+            window.history.replaceState({}, '', window.location.pathname);
+            return;
+          }
+
+          currentSession = sessionId;
+
+          const partial = {
+            sessionId,
+            score: data.data?.score || 0,
+            nivel: data.data?.nivel || '',
+            resumen: data.data?.resumen || '',
+            errores_total: data.data?.errores?.length || 0,
+            errores_preview: data.data?.errores?.slice(0, 3) || [],
+          };
+
+          activatePaywallCTAsFromEmail(partial, data.name, data.email);
+
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, '', cleanUrl);
+
+          console.log('[session-check] calling openModal with:', partial);
+          setTimeout(() => {
+            openModal(partial);
+          }, 800);
+        })
+        .catch(err => {
+          console.error('[session-check] fetch error:', err);
+        });
+    })();
+
+    function activatePaywallCTAsFromEmail(partial, name, email) {
+      document.querySelectorAll('a[href="#upload-zone"], .js-cta-paywall').forEach(function(btn) {
+        if (btn.dataset.paywallActive) return;
+        btn.dataset.paywallActive = '1';
+        btn.textContent = 'Desbloquear mi informe';
+        btn.removeAttribute('href');
+        btn.style.cursor = 'pointer';
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          openModal(partial);
+        });
+      });
+
+      if (dropzone && !dropzone.dataset.locked) {
+        dropzone.dataset.locked = '1';
+        dropzone.style.cursor = 'pointer';
+        const fileInput = document.getElementById('file-input');
+        if (fileInput) fileInput.disabled = true;
+        dropzone.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openModal(partial);
+        });
+      }
+
+      if (name || email) {
+        const prefillMsg = document.createElement('div');
+        prefillMsg.id = 'email-prefill-msg';
+        prefillMsg.style.cssText = 'margin-top:12px;padding:10px 14px;background:rgba(0,210,106,0.08);border:1px solid rgba(0,210,106,0.2);border-radius:8px;font-size:0.8125rem;color:var(--navy);text-align:center;';
+        prefillMsg.textContent = name ? `¡Hola ${name.split(' ')[0]}! Completa tu compra below.` : 'Completa tu compra.';
+        const dzDefault = dropzone?.querySelector('.dz-default');
+        if (dzDefault) dzDefault.appendChild(prefillMsg);
+      }
+    }
 
     // Show a success state modal with the full unlocked analysis
     function showSuccessModal(analysis, tier) {
@@ -3632,12 +4036,7 @@
       // Replace the tier buttons with a single "cerrar" CTA
       const tiersEl = document.querySelector('.modal-tiers');
       if (tiersEl) {
-        tiersEl.innerHTML = `
-          <div style="grid-column:1/-1;">
-            <button class="modal-tier-btn modal-tier-btn--secondary" onclick="closeModal()">
-              Cerrar
-            </button>
-          </div>`;
+        tiersEl.innerHTML = `<button class="pm-btn secondary" onclick="closeModal()">Cerrar</button>`;
       }
 
       const expiryEl = document.querySelector('.modal-expiry');
@@ -3656,6 +4055,24 @@
       });
     }, { threshold: 0 });
     stickyObserver.observe(heroCta);
+
+    // -----------------------------------------------
+    // Paid user: reset all localStorage → show fresh landing
+    // -----------------------------------------------
+    (function checkPaidUser() {
+      let paid;
+      try { paid = JSON.parse(localStorage.getItem('rumbo_paid')); } catch(e) {}
+      if (!paid) return;
+      // Clear everything — user starts fresh
+      ['rumbo_paid', 'rumbo_partial', 'rumbo_file_fp', 'rumbo_utm_stats'].forEach(function(k) {
+        localStorage.removeItem(k);
+      });
+    })();
+
+    // -----------------------------------------------
+    // Pending analysis: swap CTAs if user already analyzed
+    // -----------------------------------------------
+    activatePaywallCTAs();
   </script>
 
 </body>

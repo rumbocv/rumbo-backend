@@ -1,15 +1,22 @@
 {
   "version": 2,
   "builds": [
-    { "src": "index.js", "use": "@vercel/node" },
+    { "src": "index.js", "use": "@vercel/node", "config": { "includeFiles": ["public/**"], "maxDuration": 120 } },
     { "src": "public/**", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/index.js" },
     { "src": "/health",   "dest": "/index.js" },
-    { "src": "/login",     "dest": "/public/login.html" },
-    { "src": "/admin",     "dest": "/public/admin.html" },
+    { "src": "/login",    "dest": "/index.js" },
+    { "src": "/admin",    "dest": "/index.js" },
+    { "src": "/demo",     "dest": "/index.js" },
+    { "src": "/demo/([^/]+)", "dest": "/index.js" },
+    { "src": "/editor",    "dest": "/public/editor.html" },
     { "src": "/thank-you", "dest": "/public/thank-you.html" },
+    { "src": "/checkout", "dest": "/public/checkout.html" },
     { "src": "/(.*)",     "dest": "/public/$1" }
+  ],
+  "crons": [
+    { "path": "/api/cron/sync-brevo", "schedule": "59 23 * * *" }
   ]
 }

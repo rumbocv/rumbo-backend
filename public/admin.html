@@ -18,53 +18,113 @@
     header button { background: transparent; border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
     header button:hover { background: rgba(255,255,255,0.1); }
 
-    main { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+    main { max-width: 1480px; margin: 0 auto; padding: 28px 24px; }
 
-    /* Stats row */
-    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
-    .stat-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin-bottom: 8px; }
-    .stat-value { font-size: 32px; font-weight: 800; line-height: 1; color: #0f1f3d; }
-    .stat-value.green { color: #16a34a; }
-    .stat-sub { font-size: 12px; color: #9ca3af; margin-top: 4px; }
-    .stat-conversion { font-size: 18px; font-weight: 800; color: #6366f1; }
-
-    /* Chart */
-    .chart-card { background: #fff; border-radius: 12px; padding: 24px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
-    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .chart-title { font-size: 15px; font-weight: 700; color: #0f1f3d; }
-    .chart-sub { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+    /* Shopify-style dashboard */
+    .sf-wrapper { border: 1px solid #e1e3e5; border-radius: 12px; overflow: visible; background: #fff; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .sf-metrics { display: grid; grid-template-columns: repeat(6, 1fr); border-bottom: 1px solid #e1e3e5; }
+    .sf-metric { padding: 16px 18px; border-right: 1px solid #e1e3e5; cursor: pointer; position: relative; transition: background 0.15s; }
+    .sf-metric:last-child { border-right: none; }
+    .sf-metric.active { background: #f6f6f7; }
+    .sf-metric.active::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #22c55e; border-radius: 0; }
+    .sf-metric-label { font-size: 11px; font-weight: 600; color: #6d7175; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sf-metric-value { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1.1; margin-bottom: 5px; }
+    .sf-metric-delta { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .sf-metric-delta.up   { color: #008060; }
+    .sf-metric-delta.down { color: #d72c0d; }
+    .sf-metric-delta.flat { color: #8c9196; }
+    .sf-chart-area { padding: 20px 24px 16px; }
     canvas { width: 100%; display: block; }
 
+    .situacion-cell { position: relative; cursor: pointer; }
+    .situacion-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s;
+      pointer-events: none;
+    }
+    .situacion-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #1a1a1a;
+    }
+    .situacion-cell:hover .situacion-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* old compat */
+    .stat-value { font-size: 32px; font-weight: 800; line-height: 1; color: #0f1f3d; }
+
     /* Table */
-    .table-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+    .table-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; }
+    .table-scroll { overflow-x: auto; }
     .table-header { padding: 18px 24px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; }
     .table-title { font-size: 15px; font-weight: 700; }
     .table-count { font-size: 12px; color: #9ca3af; background: #f3f4f6; padding: 3px 10px; border-radius: 20px; }
-    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
     thead tr { background: #f9fafb; }
-    th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; }
-    td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; color: #111827; }
+    th { text-align: left; padding: 8px 10px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; white-space: nowrap; }
+    td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; color: #111827; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafafa; }
 
     .badge { display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
-    .badge.paid { background: #dcfce7; color: #15803d; }
-    .badge.free { background: #f3f4f6; color: #9ca3af; }
+    .badge.paid     { background: #dcfce7; color: #15803d; }
+    .badge.free     { background: #f3f4f6; color: #9ca3af; }
+    .badge.checkout { background: #fef9c3; color: #92400e; }
 
-    .score-wrap { display: flex; align-items: center; gap: 8px; }
-    .score-bar { flex: 1; height: 5px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+    .score-wrap { display: flex; align-items: center; gap: 6px; min-width: 80px; max-width: 110px; }
+    .score-bar { flex: 1; height: 4px; background: #e5e7eb; border-radius: 99px; overflow: hidden; min-width: 40px; }
     .score-fill { height: 100%; border-radius: 99px; background: #22c55e; }
+    .btn-mark-paid { background: none; border: 1px solid #22c55e; cursor: pointer; font-size: 10px; color: #15803d; padding: 2px 6px; border-radius: 4px; transition: background 0.15s; white-space: nowrap; }
+    .btn-mark-paid:hover { background: #dcfce7; }
 
     .empty { text-align: center; padding: 48px; color: #9ca3af; font-size: 14px; }
     .loading { text-align: center; padding: 32px; color: #9ca3af; font-size: 14px; }
 
+    .section-gap { margin-top: 24px; }
+    .utm-source  { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; background: #ede9fe; color: #7c3aed; }
+    .utm-medium  { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; background: #dbeafe; color: #1d4ed8; }
+    .pct-good    { color: #16a34a; font-weight: 700; }
+    .pct-mid     { color: #d97706; font-weight: 700; }
+    .pct-low     { color: #9ca3af; font-weight: 600; }
+
+    .btn-delete { background: none; border: none; cursor: pointer; font-size: 12px; color: #ef4444; padding: 4px 8px; border-radius: 4px; transition: background 0.15s; }
+    .btn-delete:hover { background: #fef2f2; }
+
+    /* Date filter bar */
+    .date-filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .df-label { font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 4px; }
+    .df-preset { background: #fff; border: 1.5px solid #e5e7eb; color: #374151; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+    .df-preset:hover { border-color: #22c55e; color: #15803d; }
+    .df-preset.active { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .df-sep { width: 1px; height: 20px; background: #e5e7eb; margin: 0 4px; }
+    .df-date { border: 1.5px solid #e5e7eb; border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #374151; background: #fff; cursor: pointer; }
+    .df-date:focus { outline: none; border-color: #22c55e; }
+    .df-apply { background: #0f1f3d; color: #fff; border: none; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 6px; cursor: pointer; margin-left: 4px; transition: opacity 0.15s; }
+    .df-apply:hover { opacity: 0.85; }
+
     @media (max-width: 768px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .stats-grid .stat-card:last-child { grid-column: 1 / -1; }
+      .sf-metrics { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 480px) {
-      .stats-grid { grid-template-columns: 1fr; }
+      .sf-metrics { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -77,57 +137,153 @@
       <div class="active-dot"></div>
       <span id="activeCount">—</span> en vivo
     </div>
+    <button onclick="exportUnpaidLeads()">Exportar Leads</button>
+    <button onclick="syncBrevo()">Sincronizar Brevo</button>
     <button id="logoutBtn">Salir</button>
   </div>
 </header>
 
 <main>
 
-  <!-- Stats -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">Visitas (30d)</div>
-      <div class="stat-value" id="statVisit">—</div>
+  <!-- Date filter bar -->
+  <div class="date-filter-bar">
+    <span class="df-label">Período</span>
+    <button class="df-preset" data-preset="today">Hoy</button>
+    <button class="df-preset" data-preset="yesterday">Ayer</button>
+    <button class="df-preset" data-preset="7d">7 días</button>
+    <button class="df-preset active" data-preset="30d">30 días</button>
+    <div class="df-sep"></div>
+    <input type="date" class="df-date" id="df-from" placeholder="Desde">
+    <span style="font-size:12px;color:#9ca3af">→</span>
+    <input type="date" class="df-date" id="df-to" placeholder="Hasta">
+    <button class="df-apply" onclick="applyDateFilter()">Aplicar</button>
+    <div class="df-sep"></div>
+    <button onclick="openLocationsPopup()" style="display:flex;align-items:center;gap:5px;background:#fff;border:1.5px solid #e5e7eb;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:12px;color:#374151;font-weight:600">
+      📍 <span id="locationsBadge">—</span>
+    </button>
+    <button onclick="toggleGeoMap()" style="display:flex;align-items:center;gap:5px;background:#0f1923;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:12px;color:#fff;font-weight:600">
+      <span id="geoLiveDot" style="width:6px;height:6px;border-radius:50%;background:#6b7280;display:inline-block"></span>
+      <span id="geoLiveText">En vivo</span>
+    </button>
+  </div>
+
+  <!-- Geo map widget (floating, togglable) -->
+  <div id="geoWidget" style="display:none;position:fixed;bottom:20px;right:20px;z-index:100;width:200px;border:1px solid #e1e3e5;border-radius:12px;background:#0f1923;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.2)">
+    <canvas id="geoCanvas" style="display:block;width:100%;cursor:default"></canvas>
+  </div>
+
+  <!-- Dashboard card: metrics + chart -->
+  <div class="sf-wrapper" style="margin-bottom:24px">
+    <div class="sf-metrics">
+      <div class="sf-metric active" data-metric="visits" onclick="selectMetric(this)">
+        <div class="sf-metric-label">Sesiones</div>
+        <div class="sf-metric-value" id="mVisits">—</div>
+        <div class="sf-metric-delta flat" id="dVisits">vs período anterior</div>
+      </div>
+      <div class="sf-metric" data-metric="add_to_cart" onclick="selectMetric(this)">
+        <div class="sf-metric-label">CVs subidos</div>
+        <div class="sf-metric-value" id="mAddToCart">—</div>
+        <div class="sf-metric-delta flat" id="dAddToCart">vs período anterior</div>
+      </div>
+      <div class="sf-metric" data-metric="checkouts" onclick="selectMetric(this)">
+        <div class="sf-metric-label">Checkouts</div>
+        <div class="sf-metric-value" id="mCheckout">—</div>
+        <div class="sf-metric-delta flat" id="dCheckout">vs período anterior</div>
+      </div>
+      <div class="sf-metric" data-metric="purchases" onclick="selectMetric(this)">
+        <div class="sf-metric-label">Compras</div>
+        <div class="sf-metric-value" id="mPurchase">—</div>
+        <div class="sf-metric-delta flat" id="dPurchase">vs período anterior</div>
+      </div>
+      <div class="sf-metric" data-metric="cr_checkout" onclick="selectMetric(this)">
+        <div class="sf-metric-label">Conv. checkout</div>
+        <div class="sf-metric-value" id="mCrCheckout">—</div>
+        <div class="sf-metric-delta flat" id="dCrCheckout">vs período anterior</div>
+      </div>
+      <div class="sf-metric" data-metric="cr_purchase" onclick="selectMetric(this)">
+        <div class="sf-metric-label">Conv. compra</div>
+        <div class="sf-metric-value" id="mCrPurchase">—</div>
+        <div class="sf-metric-delta flat" id="dCrPurchase">vs período anterior</div>
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Checkouts (30d)</div>
-      <div class="stat-value" id="statCheckout">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Compras (30d)</div>
-      <div class="stat-value green" id="statPurchase">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Conv. Checkout</div>
-      <div class="stat-conversion" id="statCrCheckout">—</div>
-      <div class="stat-sub">visitas → checkout</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Conv. Compra</div>
-      <div class="stat-conversion" id="statCrPurchase">—</div>
-      <div class="stat-sub">visitas → compra</div>
+    <div class="sf-chart-area">
+      <canvas id="sfChart" height="200"></canvas>
     </div>
   </div>
 
-  <!-- Chart -->
-  <div class="chart-card">
-    <div class="chart-header">
-      <div>
-        <div class="chart-title">Visitas diarias</div>
-        <div class="chart-sub">Últimos 30 días</div>
-      </div>
+  <!-- UTM Attribution -->
+  <div class="table-card section-gap">
+    <div class="table-header">
+      <div class="table-title">Atribución UTM <span id="utmDateLabel" style="font-size:12px;color:#9ca3af;font-weight:400"></span></div>
     </div>
-    <canvas id="visitChart" height="180"></canvas>
+    <div id="utmContainer"><div class="loading">Cargando...</div></div>
   </div>
 
   <!-- CVs table -->
-  <div class="table-card">
+  <div class="table-card section-gap">
     <div class="table-header">
       <div class="table-title">CVs analizados</div>
       <div class="table-count" id="cvsCount">—</div>
     </div>
     <div id="tableContainer"><div class="loading">Cargando...</div></div>
   </div>
+
+<!-- Locations popup -->
+<div id="locationsPopup" onclick="if(event.target===this)closeLocationsPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;width:320px;max-height:480px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.18);display:flex;flex-direction:column">
+    <div style="padding:14px 18px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:14px;font-weight:700">📍 Ubicaciones</span>
+      <button onclick="closeLocationsPopup()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;line-height:1">×</button>
+    </div>
+    <div id="locationsPopupContent" style="overflow-y:auto;padding:8px 0"></div>
+  </div>
+</div>
+
+<!-- Optimize modal -->
+<div id="optimizeModal" onclick="if(event.target===this)closeOptimizeModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;width:560px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:15px;font-weight:700">⚡ Optimizar CV con IA</span>
+      <button onclick="closeOptimizeModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;line-height:1">×</button>
+    </div>
+    <div style="padding:18px 20px;overflow-y:auto;flex:1">
+      <input type="hidden" id="optimizeSessionId">
+      <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Puesto objetivo / Oferta laboral <span style="color:#ef4444">*</span></label>
+      <textarea id="optimizeJD" rows="8" placeholder="Pegá la descripción del puesto o escribí el título del rol (ej: Analista de Datos Sr, Marketing Manager)..." style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;font-size:12px;resize:vertical;font-family:inherit;line-height:1.5"></textarea>
+      <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end">
+        <div style="flex:1">
+          <label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Mercado objetivo</label>
+          <input id="optimizeMarket" type="text" placeholder="Ej: Argentina, USA, LATAM..." style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit">
+        </div>
+        <button onclick="runOptimization()" id="optimizeRunBtn" style="background:#0f1f3d;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Ejecutar ⚡</button>
+      </div>
+      <div id="optimizeStatus" style="display:none;margin-top:14px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:12px;color:#6b7280;text-align:center">Procesando con IA… puede tardar hasta 60 segundos.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Result modal -->
+<div id="resultModal" onclick="if(event.target===this)closeResultModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;width:700px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <span style="font-size:15px;font-weight:700">✅ CV Optimizado</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="downloadOptimization()" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">↓ Descargar todo</button>
+        <button onclick="closeResultModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;line-height:1">×</button>
+      </div>
+    </div>
+    <div style="display:flex;flex:1;overflow:hidden;min-height:0">
+      <div style="flex:1;border-right:1px solid #f3f4f6;display:flex;flex-direction:column;overflow:hidden">
+        <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:12px 20px 8px">CV Optimizado</div>
+        <iframe id="resultCV" style="flex:1;width:100%;border:none" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+        <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:12px 20px 8px">Informe de optimización</div>
+        <iframe id="resultInforme" style="flex:1;width:100%;border:none" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
 
 </main>
 
@@ -138,9 +294,7 @@
   let accessToken    = null;
 
   async function initSupabase() {
-    const res = await fetch('/api/admin/config');
-    const { supabaseUrl, supabaseAnonKey } = await res.json();
-    supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    supabaseClient = supabase.createClient(window.__SB_URL__, window.__SB_ANON__);
   }
 
   async function checkAuth() {
@@ -164,92 +318,202 @@
 
   async function authFetch(url) {
     const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}` } });
-    return res.json();
+    try { return await res.json(); } catch { return { ok: false }; }
   }
 
-  // ---- Chart ----
-  function drawChart(timeseries) {
-    const canvas = document.getElementById('visitChart');
+  // ---- Date filter ----
+  let filterFrom = null; // 'YYYY-MM-DD' or null
+  let filterTo   = null;
+
+  function getDateParams() {
+    const p = [];
+    if (filterFrom) p.push('from=' + filterFrom);
+    if (filterTo)   p.push('to='   + filterTo);
+    return p.length ? '?' + p.join('&') : '';
+  }
+
+  function setPreset(preset) {
+    const today = new Date();
+    const fmt = d => d.toISOString().slice(0, 10);
+    document.querySelectorAll('.df-preset').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.df-preset[data-preset="${preset}"]`)?.classList.add('active');
+    document.getElementById('df-from').value = '';
+    document.getElementById('df-to').value   = '';
+    if (preset === 'today') {
+      filterFrom = filterTo = fmt(today);
+    } else if (preset === 'yesterday') {
+      const y = new Date(today); y.setDate(y.getDate() - 1);
+      filterFrom = filterTo = fmt(y);
+    } else if (preset === '7d') {
+      const s = new Date(today); s.setDate(s.getDate() - 6);
+      filterFrom = fmt(s); filterTo = fmt(today);
+    } else {
+      const s = new Date(today); s.setDate(s.getDate() - 29);
+      filterFrom = fmt(s); filterTo = fmt(today);
+    }
+    loadStats(); loadCVs(); loadUTM(); loadLocations();
+  }
+
+  function applyDateFilter() {
+    const from = document.getElementById('df-from').value;
+    const to   = document.getElementById('df-to').value;
+    if (!from && !to) return;
+    document.querySelectorAll('.df-preset').forEach(b => b.classList.remove('active'));
+    filterFrom = from || null;
+    filterTo   = to   || null;
+    loadStats(); loadCVs(); loadUTM(); loadLocations();
+  }
+
+  document.querySelectorAll('.df-preset').forEach(btn => {
+    btn.addEventListener('click', () => setPreset(btn.dataset.preset));
+  });
+
+  // ---- Shopify Dashboard ----
+  let currentTimeseries = [];
+  let currentGranularity = 'day';
+  let activeMetric = 'visits';
+
+  function deltaHtml(curr, prev) {
+    if (prev === 0 && curr === 0) return '<span class="flat">Sin datos</span>';
+    if (prev === 0) return `<span class="up">↑ nuevo</span>`;
+    const pct = ((curr - prev) / prev * 100).toFixed(1);
+    const cls = pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat';
+    const arrow = pct > 0 ? '↑' : pct < 0 ? '↓' : '→';
+    return `<span class="${cls}">${arrow} ${Math.abs(pct)}%</span> <span style="color:#8c9196;font-weight:400">vs anterior</span>`;
+  }
+
+  function selectMetric(el) {
+    document.querySelectorAll('.sf-metric').forEach(m => m.classList.remove('active'));
+    el.classList.add('active');
+    activeMetric = el.dataset.metric;
+    drawSfChart(currentTimeseries, currentGranularity);
+  }
+
+  function getMetricValues(ts) {
+    switch (activeMetric) {
+      case 'visits':      return ts.map(d => d.visits);
+      case 'add_to_cart': return ts.map(d => d.add_to_cart);
+      case 'checkouts':   return ts.map(d => d.checkouts);
+      case 'purchases':   return ts.map(d => d.purchases);
+      case 'cr_checkout': return ts.map((_, i) => {
+        const v = ts[i].visits; const c = ts[i].checkouts;
+        return v > 0 ? parseFloat((c/v*100).toFixed(1)) : 0;
+      });
+      case 'cr_purchase': return ts.map((_, i) => {
+        const v = ts[i].visits; const p = ts[i].purchases;
+        return v > 0 ? parseFloat((p/v*100).toFixed(1)) : 0;
+      });
+      default: return ts.map(d => d.visits);
+    }
+  }
+
+  function drawSfChart(timeseries, granularity) {
+    currentTimeseries  = timeseries;
+    currentGranularity = granularity;
+
+    const canvas = document.getElementById('sfChart');
     const dpr    = window.devicePixelRatio || 1;
     const W      = canvas.parentElement.clientWidth - 48;
-    const H      = 180;
-    canvas.width  = W * dpr;
-    canvas.height = H * dpr;
-    canvas.style.width  = W + 'px';
-    canvas.style.height = H + 'px';
+    const H      = 200;
+    canvas.width  = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
-    const vals   = timeseries.map(d => d.visits);
+    const vals   = getMetricValues(timeseries);
     const maxVal = Math.max(...vals, 1);
     const n      = timeseries.length;
-    const padL   = 36, padR = 8, padT = 12, padB = 32;
+    const padL   = 42, padR = 16, padT = 16, padB = 36;
     const chartW = W - padL - padR;
     const chartH = H - padT - padB;
-    const barW   = Math.max(2, (chartW / n) * 0.6);
-    const gap    = chartW / n;
 
-    // Grid lines
-    ctx.strokeStyle = '#f3f4f6';
-    ctx.lineWidth   = 1;
+    // Grid
+    ctx.strokeStyle = '#f1f1f1'; ctx.lineWidth = 1;
     [0, 0.25, 0.5, 0.75, 1].forEach(f => {
       const y = padT + chartH * (1 - f);
       ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
     });
 
     // Y labels
-    ctx.fillStyle  = '#9ca3af';
-    ctx.font       = '10px system-ui';
-    ctx.textAlign  = 'right';
-    [0, Math.round(maxVal / 2), maxVal].forEach((v, i) => {
+    ctx.fillStyle = '#8c9196'; ctx.font = '10px system-ui'; ctx.textAlign = 'right';
+    [0, Math.round(maxVal * 0.5), maxVal].forEach(v => {
       const y = padT + chartH * (1 - v / maxVal);
-      ctx.fillText(v, padL - 4, y + 3);
+      ctx.fillText(activeMetric.startsWith('cr') ? v + '%' : v, padL - 6, y + 3);
     });
 
-    // Bars
-    timeseries.forEach((d, i) => {
-      const x    = padL + i * gap + (gap - barW) / 2;
-      const barH = (d.visits / maxVal) * chartH;
-      const y    = padT + chartH - barH;
-      const grad = ctx.createLinearGradient(0, y, 0, y + barH);
-      grad.addColorStop(0, '#22c55e');
-      grad.addColorStop(1, '#86efac');
-      ctx.fillStyle = grad;
-      const r = Math.min(3, barW / 2);
+    // Smooth line
+    if (n > 1) {
+      const xs = vals.map((_, i) => padL + (i / (n - 1)) * chartW);
+      const ys = vals.map(v => padT + chartH * (1 - v / maxVal));
+
+      // Area fill
+      const grad = ctx.createLinearGradient(0, padT, 0, padT + chartH);
+      grad.addColorStop(0, 'rgba(34,197,94,0.15)');
+      grad.addColorStop(1, 'rgba(34,197,94,0)');
       ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + barW - r, y);
-      ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
-      ctx.lineTo(x + barW, y + barH);
-      ctx.lineTo(x, y + barH);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.moveTo(xs[0], padT + chartH);
+      ctx.lineTo(xs[0], ys[0]);
+      for (let i = 1; i < n; i++) {
+        const cpx = (xs[i-1] + xs[i]) / 2;
+        ctx.bezierCurveTo(cpx, ys[i-1], cpx, ys[i], xs[i], ys[i]);
+      }
+      ctx.lineTo(xs[n-1], padT + chartH);
       ctx.closePath();
-      ctx.fill();
-    });
+      ctx.fillStyle = grad; ctx.fill();
 
-    // X labels (every 5 days)
-    ctx.fillStyle = '#9ca3af';
-    ctx.textAlign = 'center';
-    ctx.font      = '10px system-ui';
+      // Line
+      ctx.beginPath();
+      ctx.moveTo(xs[0], ys[0]);
+      for (let i = 1; i < n; i++) {
+        const cpx = (xs[i-1] + xs[i]) / 2;
+        ctx.bezierCurveTo(cpx, ys[i-1], cpx, ys[i], xs[i], ys[i]);
+      }
+      ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // Dots on non-zero
+      ctx.fillStyle = '#22c55e';
+      vals.forEach((v, i) => {
+        if (!v) return;
+        ctx.beginPath(); ctx.arc(xs[i], ys[i], 3.5, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+
+    // X labels
+    ctx.fillStyle = '#8c9196'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    const step = Math.max(1, Math.floor(n / 8));
     timeseries.forEach((d, i) => {
-      if (i % 5 !== 0 && i !== n - 1) return;
-      const x = padL + i * gap + gap / 2;
-      const label = d.date.slice(5).replace('-', '/');
-      ctx.fillText(label, x, H - 6);
+      if (i % step !== 0 && i !== n - 1) return;
+      const x = n > 1 ? padL + (i / (n - 1)) * chartW : padL + chartW / 2;
+      const label = granularity === 'hour'
+        ? d.date.slice(11) + 'h'
+        : d.date.slice(5).replace('-', '/');
+      ctx.fillText(label, x, H - 8);
     });
   }
 
   // ---- Stats ----
   async function loadStats() {
-    const { stats, timeseries, conversions } = await authFetch('/api/admin/stats');
+    const { stats, prev_stats, timeseries, granularity, conversions, prev_conversions } = await authFetch('/api/admin/stats' + getDateParams());
     if (!stats) return;
-    document.getElementById('statVisit').textContent    = stats.visit    ?? 0;
-    document.getElementById('statCheckout').textContent = stats.checkout ?? 0;
-    document.getElementById('statPurchase').textContent = stats.purchase ?? 0;
-    document.getElementById('statCrCheckout').textContent = (conversions?.cr_checkout ?? '0.0') + '%';
-    document.getElementById('statCrPurchase').textContent = (conversions?.cr_purchase ?? '0.0') + '%';
-    if (timeseries) drawChart(timeseries);
+
+    document.getElementById('mVisits').textContent    = (stats.visit      ?? 0).toLocaleString('es-AR');
+    document.getElementById('mAddToCart').textContent = (stats.add_to_cart ?? 0).toLocaleString('es-AR');
+    document.getElementById('mCheckout').textContent  = (stats.checkout   ?? 0).toLocaleString('es-AR');
+    document.getElementById('mPurchase').textContent  = (stats.purchase   ?? 0).toLocaleString('es-AR');
+    document.getElementById('mCrCheckout').textContent = (conversions?.cr_checkout ?? '0.0') + '%';
+    document.getElementById('mCrPurchase').textContent = (conversions?.cr_purchase ?? '0.0') + '%';
+
+    if (prev_stats) {
+      document.getElementById('dVisits').innerHTML    = deltaHtml(stats.visit,       prev_stats.visit);
+      document.getElementById('dAddToCart').innerHTML = deltaHtml(stats.add_to_cart, prev_stats.add_to_cart);
+      document.getElementById('dCheckout').innerHTML  = deltaHtml(stats.checkout,    prev_stats.checkout);
+      document.getElementById('dPurchase').innerHTML  = deltaHtml(stats.purchase,    prev_stats.purchase);
+      document.getElementById('dCrCheckout').innerHTML = deltaHtml(parseFloat(conversions?.cr_checkout), parseFloat(prev_conversions?.cr_checkout));
+      document.getElementById('dCrPurchase').innerHTML = deltaHtml(parseFloat(conversions?.cr_purchase), parseFloat(prev_conversions?.cr_purchase));
+    }
+
+    if (timeseries) drawSfChart(timeseries, granularity || 'day');
   }
 
   // ---- Active visitors ----
@@ -261,28 +525,600 @@
   }
 
   // ---- CVs table ----
+  async function downloadCV(fullId) {
+    try {
+      const data = await authFetch(`/api/admin/cvs/${fullId}/download`);
+      if (data.ok && data.url) {
+        window.open(data.url, '_blank');
+      } else {
+        alert('No se encontró el archivo. Solo los CVs subidos a partir de ahora se almacenan.');
+      }
+    } catch (err) {
+      alert('Error al obtener el archivo.');
+    }
+  }
+
+  async function markPaidManual(fullId) {
+    if (!confirm('¿Marcar este usuario como pagado manualmente?')) return;
+    try {
+      const res = await fetch(`/api/admin/cvs/${fullId}/mark-paid`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+      const data = await res.json();
+      if (data.ok) {
+        loadCVs();
+      } else {
+        alert(data.error || 'Error al marcar como pagado.');
+      }
+    } catch (err) {
+      alert('Error de conexión.');
+    }
+  }
+
+  function copyToClipboard(text, el) {
+    navigator.clipboard.writeText(text).then(() => {
+      const original = el.textContent;
+      el.textContent = '✓ Copiado';
+      el.style.color = '#22c55e';
+      setTimeout(() => {
+        el.textContent = original;
+        el.style.color = '#6b7280';
+      }, 1500);
+    });
+  }
+
+  async function deleteCV(fullId) {
+    if (!confirm('¿Eliminar este registro de CV? La acción no se puede deshacer.')) return;
+    try {
+      const res = await fetch(`/api/admin/cvs/${fullId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+      const data = await res.json();
+      if (data.ok) {
+        loadCVs();
+        loadStats();
+      } else {
+        alert(data.error || 'Error al eliminar.');
+      }
+    } catch (err) {
+      alert('Error de conexión al eliminar.');
+    }
+  }
+
+  async function editEmail(fullId, currentEmail, leadEmail) {
+    const newEmail = prompt('Ingrese el email:', currentEmail || leadEmail || '');
+    if (newEmail === null) return;
+    try {
+      const res = await fetch(`/api/admin/cvs/${fullId}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}` 
+        },
+        body: JSON.stringify({ email: newEmail.trim() || null })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        loadCVs();
+      } else {
+        alert(data.error || 'Error al actualizar email.');
+      }
+    } catch (err) {
+      alert('Error de conexión.');
+    }
+  }
+
+  async function exportUnpaidLeads() {
+    try {
+      const { ok, count, leads } = await authFetch('/api/admin/unpaid-leads');
+      if (!ok) throw new Error('Error al obtener datos');
+      
+      if (!leads || leads.length === 0) {
+        alert('No hay leads sin pagar.');
+        return;
+      }
+
+      const csv = ['email,nombre'].join(',') + '\n' + 
+        leads.map(l => `${l.email || ''},${l.name || ''}`).join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `leads-no-pagados-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      alert(`Se exportaron ${count} leads.`);
+    } catch (err) {
+      alert('Error al exportar leads.');
+    }
+  }
+
+  async function syncBrevo() {
+    if (!confirm('¿Sincronizar todos los leads NO pagados a Brevo?')) return;
+    try {
+      const res = await fetch('/api/admin/sync-brevo', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert(`Se sincronizaron ${data.synced} leads a Brevo.`);
+      } else {
+        alert(data.error || 'Error al sincronizar.');
+      }
+    } catch (err) {
+      alert('Error de conexión.');
+    }
+  }
+
   async function loadCVs() {
     const container = document.getElementById('tableContainer');
-    const { cvs } = await authFetch('/api/admin/cvs');
+    const { cvs } = await authFetch('/api/admin/cvs' + getDateParams());
+    document.getElementById('cvsCount').textContent = cvs ? cvs.length : 0;
     if (!cvs || cvs.length === 0) {
       container.innerHTML = '<div class="empty">No hay CVs registrados aún.</div>';
       return;
     }
-    document.getElementById('cvsCount').textContent = cvs.length;
     const rows = cvs.map(cv => {
-      const date   = cv.created_at ? new Date(cv.created_at).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
-      const score  = cv.score != null ? `<div class="score-wrap"><span style="min-width:26px;font-size:12px">${cv.score}</span><div class="score-bar"><div class="score-fill" style="width:${cv.score}%"></div></div></div>` : '—';
-      const nivel  = cv.nivel || '—';
-      const estado = cv.paid ? '<span class="badge paid">Pago</span>' : '<span class="badge free">Gratis</span>';
-      const plan   = cv.tier ? `<span style="font-size:12px;font-weight:600;color:#6366f1">${cv.tier}</span>` : '—';
-      const file   = cv.filename ? `<span style="font-size:11px;color:#9ca3af">${cv.filename}</span>` : '—';
-      return `<tr><td>${date}</td><td>${score}</td><td style="font-size:12px">${nivel}</td><td>${estado}</td><td>${plan}</td><td>${file}</td></tr>`;
+      const date        = cv.created_at ? new Date(cv.created_at).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
+      const realScore   = cv.real_score    != null ? cv.real_score    : '—';
+      const dispScore   = cv.display_score != null ? cv.display_score : '—';
+      const scoreReal   = cv.real_score != null
+        ? `<div class="score-wrap"><span style="min-width:26px;font-size:12px;font-weight:700">${realScore}</span><div class="score-bar"><div class="score-fill" style="width:${cv.real_score}%;background:#6366f1"></div></div></div>`
+        : '—';
+      const scoreDisp   = cv.display_score != null
+        ? `<div class="score-wrap"><span style="min-width:26px;font-size:12px">${dispScore}</span><div class="score-bar"><div class="score-fill" style="width:${cv.display_score}%"></div></div></div>`
+        : '—';
+      const nivelRaw    = cv.nivel || '';
+      const nivel       = nivelRaw ? nivelRaw.charAt(0).toUpperCase() + nivelRaw.slice(1).toLowerCase() : '—';
+      const estadoBadge = cv.paid
+        ? '<span class="badge paid">Pago</span>'
+        : cv.checkout
+          ? `<span class="badge checkout">Checkout</span>`
+          : '<span class="badge free">Gratis</span>';
+      const estado = `<div style="display:flex;flex-direction:column;gap:3px;align-items:center">${estadoBadge}</div>`;
+      const TIER_PRICE = { informe: 29990, cv: 19990 };
+      const tierPrice = cv.tier && TIER_PRICE[cv.tier] ? `$${TIER_PRICE[cv.tier].toLocaleString('es-AR')}` : null;
+      const plan = cv.tier
+        ? `<div style="font-size:12px;font-weight:700;color:#6366f1">${tierPrice || cv.tier}</div><div style="font-size:10px;color:#9ca3af">${cv.tier}</div>`
+        : '<span style="color:#d1d5db">—</span>';
+      const file        = cv.filename && cv.full_id
+        ? `<button onclick="downloadCV('${cv.full_id}')" style="background:none;border:none;cursor:pointer;font-size:11px;color:#6366f1;text-decoration:underline;padding:0;text-align:left;" title="Descargar CV">⬇ ${cv.filename}</button>`
+        : '—';
+      const contact     = cv.contact_name
+        ? `<div style="font-weight:600;font-size:13px">${cv.contact_name}</div>`
+        : '<span style="color:#d1d5db">—</span>';
+      const emailEdit   = cv.full_id
+        ? `<span class="email-cell" onclick="editEmail('${cv.full_id}', '${cv.contact_email || ''}', '${cv.lead_email || ''}')" style="cursor:pointer;font-size:11px;color:#6366f1">${cv.contact_email || cv.lead_email || '<span style="color:#9ca3af">+ agregar</span>'}</span>`
+        : (cv.lead_email || '<span style="color:#d1d5db">—</span>');
+      const puesto      = cv.puesto
+        ? `<span style="font-size:12px;color:#374151">${cv.puesto}</span>`
+        : '<span style="color:#d1d5db;font-size:11px">—</span>';
+      const situacion   = cv.situacion
+        ? `<span class="situacion-cell" style="font-size:11px;background:#f0fdf4;color:#15803d;padding:2px 7px;border-radius:99px;font-weight:600;white-space:nowrap">${cv.situacion}<span class="situacion-tooltip">${cv.puesto || ''}</span></span>`
+        : '<span style="color:#d1d5db;font-size:11px">—</span>';
+      const deleteBtn   = cv.full_id
+        ? `<button class="btn-delete" onclick="deleteCV('${cv.full_id}')" title="Eliminar registro">🗑</button>`
+        : '';
+      const sessionId = cv.full_id ? `<span onclick="copyToClipboard('${cv.full_id}', this)" style="font-family:monospace;font-size:10px;color:#6b7280;cursor:pointer" title="Click para copiar ID completo">${cv.id || cv.full_id.slice(0,8)}...</span>` : '—';
+      const optimizeBtn = cv.full_id
+        ? `<button onclick="openOptimizeModal('${cv.full_id}')" title="Optimizar CV" style="background:none;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;font-size:11px;color:#374151;padding:2px 7px;white-space:nowrap">⚡</button>`
+        : '';
+      const downloadOptBtn = cv.full_id
+        ? cv.has_optimization
+          ? `<button onclick="downloadOptimizationById('${cv.full_id}')" title="Descargar optimización" style="background:#22c55e;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;white-space:nowrap;font-weight:700">↓</button>`
+          : `<button disabled title="Sin optimización" style="background:#e5e7eb;color:#9ca3af;border:none;border-radius:4px;font-size:11px;padding:2px 7px;cursor:not-allowed">↓</button>`
+        : '';
+      return `<tr>
+        <td style="white-space:nowrap;font-size:12px">${date}</td>
+        <td style="width:90px">${sessionId}</td>
+        <td style="width:80px">${scoreReal}</td>
+        <td style="width:80px">${scoreDisp}</td>
+        <td style="font-size:12px;text-align:center">${nivel}</td>
+        <td style="text-align:center">${situacion}</td>
+        <td style="text-align:center">${estado}</td>
+        <td style="text-align:center">${plan}</td>
+        <td>${contact}</td>
+        <td>${emailEdit}</td>
+        <td>${file}</td>
+        <td style="white-space:nowrap">${optimizeBtn} ${downloadOptBtn}</td>
+        <td>${deleteBtn}</td>
+      </tr>`;
     }).join('');
+    container.innerHTML = `<div class="table-scroll"><table>
+      <thead><tr>
+        <th>Fecha</th>
+        <th style="width:90px">Session ID</th>
+        <th style="width:80px">Score Real</th>
+        <th style="width:80px">Score Usuario</th>
+        <th style="text-align:center">Nivel</th>
+        <th style="text-align:center">Situación</th>
+        <th style="text-align:center">Estado</th>
+        <th style="text-align:center">Plan</th>
+        <th>Nombre</th><th>Email</th><th>Archivo</th><th>IA</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  }
+
+  // ---- Locations popup ----
+  let _locationsData = [];
+
+  async function loadLocations() {
+    try {
+      const { ok, locations } = await authFetch('/api/admin/locations' + getDateParams());
+      _locationsData = (ok && locations) ? locations : [];
+      const badge = document.getElementById('locationsBadge');
+      const total = _locationsData.reduce((s, l) => s + l.count, 0);
+      if (badge) badge.textContent = total > 0 ? `${total} visitas` : 'Ubicaciones';
+    } catch { _locationsData = []; }
+  }
+
+  async function openLocationsPopup() {
+    const popup = document.getElementById('locationsPopup');
+    const content = document.getElementById('locationsPopupContent');
+    if (!popup || !content) return;
+    
+    content.innerHTML = '<div style="padding:20px;font-size:12px;color:#9ca3af;text-align:center">Cargando...</div>';
+    popup.style.display = 'flex';
+    
+    try {
+      const { ok, locations } = await authFetch('/api/admin/locations' + getDateParams());
+      _locationsData = (ok && locations) ? locations : [];
+    } catch { _locationsData = []; }
+    
+    const badge = document.getElementById('locationsBadge');
+    const total = _locationsData.reduce((s, l) => s + l.count, 0);
+    if (badge) badge.textContent = total > 0 ? `${total} visitas` : 'Ubicaciones';
+    
+    if (!_locationsData.length) {
+      content.innerHTML = '<div style="padding:20px;font-size:12px;color:#9ca3af;text-align:center">Sin datos de ubicación para el período.</div>';
+    } else {
+      const max = _locationsData[0].count;
+      content.innerHTML = _locationsData.map(l => `
+        <div style="padding:7px 18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-size:13px;color:#111">${l.city}${l.region && l.region !== l.city ? `, ${l.region}` : ''}</span>
+            <span style="font-size:12px;color:#6b7280;font-weight:700;margin-left:8px">${l.count}</span>
+          </div>
+          <div style="height:4px;background:#f3f4f6;border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${Math.round(l.count / max * 100)}%;background:#6366f1;border-radius:99px"></div>
+          </div>
+        </div>`).join('');
+    }
+    popup.style.display = 'flex';
+  }
+
+  function closeLocationsPopup() {
+    document.getElementById('locationsPopup').style.display = 'none';
+  }
+
+  // ---- CV Optimization ----
+  let _currentOptResult = null;
+  let _currentOptSessionId = null;
+
+  function openOptimizeModal(sessionId) {
+    _currentOptSessionId = sessionId;
+    document.getElementById('optimizeSessionId').value = sessionId;
+    document.getElementById('optimizeJD').value = '';
+    document.getElementById('optimizeMarket').value = '';
+    document.getElementById('optimizeStatus').style.display = 'none';
+    document.getElementById('optimizeRunBtn').disabled = false;
+    document.getElementById('optimizeRunBtn').textContent = 'Ejecutar ⚡';
+    document.getElementById('optimizeModal').style.display = 'flex';
+  }
+
+  function closeOptimizeModal() {
+    document.getElementById('optimizeModal').style.display = 'none';
+  }
+
+  function closeResultModal() {
+    document.getElementById('resultModal').style.display = 'none';
+    _currentOptResult = null;
+  }
+
+  async function runOptimization() {
+    const sessionId = document.getElementById('optimizeSessionId').value;
+    const jd        = document.getElementById('optimizeJD').value.trim();
+    const market    = document.getElementById('optimizeMarket').value.trim();
+    if (!jd) { alert('Ingresá el puesto objetivo antes de ejecutar.'); return; }
+
+    const btn    = document.getElementById('optimizeRunBtn');
+    const status = document.getElementById('optimizeStatus');
+    btn.disabled = true;
+    btn.textContent = 'Procesando…';
+    status.style.display = 'block';
+
+    try {
+      const res = await fetch(`/api/admin/cvs/${sessionId}/optimize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+        body: JSON.stringify({ jd, market: market || null }),
+      });
+      const data = await res.json();
+      if (!data.ok) { alert(data.error || 'Error al optimizar.'); return; }
+
+      _currentOptResult = data;
+      closeOptimizeModal();
+      document.getElementById('resultCV').srcdoc      = data.cv_optimized;
+      document.getElementById('resultInforme').srcdoc = data.informe;
+      document.getElementById('resultModal').style.display = 'flex';
+      loadCVs(); // refresh download button state
+    } catch (err) {
+      alert('Error de conexión.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Ejecutar ⚡';
+      status.style.display = 'none';
+    }
+  }
+
+  async function downloadOptimizationById(sessionId) {
+    const data = await authFetch(`/api/admin/cvs/${sessionId}/optimization`);
+    if (!data.ok || !data.exists) { alert('No hay optimización guardada para este CV.'); return; }
+    dlHtml(data.cv_optimized, 'cv_optimizado.html');
+    setTimeout(() => dlHtml(data.informe, 'informe_optimizacion.html'), 400);
+  }
+
+  function downloadOptimization() {
+    if (!_currentOptResult || !_currentOptSessionId) return;
+    dlHtml(_currentOptResult.cv_optimized, 'cv_optimizado.html');
+    setTimeout(() => dlHtml(_currentOptResult.informe, 'informe_optimizacion.html'), 400);
+  }
+
+  function dlHtml(html, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function dlText(text, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // ---- UTM Attribution ----
+  async function loadUTM() {
+    const container = document.getElementById('utmContainer');
+    const label = document.getElementById('utmDateLabel');
+    if (label) label.textContent = filterFrom === filterTo
+      ? `— ${filterFrom || 'últimos 30 días'}`
+      : `— ${filterFrom || ''} → ${filterTo || ''}`;
+    const { ok, utm } = await authFetch('/api/admin/utm' + getDateParams());
+    if (!ok || !utm || utm.length === 0) {
+      container.innerHTML = '<div class="empty">Sin datos UTM para el período.</div>';
+      return;
+    }
+    function pct(num, den) {
+      if (!den) return '<span class="pct-low">—</span>';
+      const v = (num / den * 100).toFixed(1);
+      const cls = v >= 5 ? 'pct-good' : v >= 1 ? 'pct-mid' : 'pct-low';
+      return `<span class="${cls}">${v}%</span>`;
+    }
+    const rows = utm.map(r => `
+      <tr>
+        <td><span class="utm-source">${r.source}</span></td>
+        <td><span class="utm-medium">${r.medium}</span></td>
+        <td style="font-size:12px;color:#6b7280">${r.campaign}</td>
+        <td style="font-weight:600">${r.visit}</td>
+        <td>${r.checkout}</td>
+        <td>${r.purchase}</td>
+        <td>${pct(r.checkout, r.visit)}</td>
+        <td>${pct(r.purchase, r.visit)}</td>
+      </tr>`).join('');
     container.innerHTML = `<table>
-      <thead><tr><th>Fecha</th><th>Score</th><th>Nivel</th><th>Estado</th><th>Plan</th><th>Archivo</th></tr></thead>
+      <thead><tr>
+        <th>Fuente</th><th>Medium</th><th>Campaign</th>
+        <th>Visitas</th><th>Checkouts</th><th>Compras</th>
+        <th>Checkout %</th><th>Conv. %</th>
+      </tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
   }
+
+  async function loadLocations() {
+    const container = document.getElementById('locationsContainer');
+    const { ok, locations } = await authFetch('/api/admin/locations' + getDateParams());
+    if (!ok || !locations?.length) {
+      container.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:#9ca3af">Sin datos aún.</div>';
+      return;
+    }
+    const max = locations[0].count;
+    const rows = locations.map(l => `
+      <div style="padding:3px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+          <span style="font-size:11px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${l.city}${l.region && l.region !== l.city ? `, ${l.region}` : ''}</span>
+          <span style="font-size:10px;color:#9ca3af;flex-shrink:0;margin-left:4px">${l.count}</span>
+        </div>
+        <div style="height:2px;background:#f3f4f6;border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${Math.round(l.count / max * 100)}%;background:#6366f1;border-radius:99px"></div>
+        </div>
+      </div>`).join('');
+    container.innerHTML = `<div style="padding:2px 0 8px">${rows}</div>`;
+  }
+
+  // ── GEO MAP ──────────────────────────────────────────────────────
+  const GEO_BOUNDS = { minLon: -74.0, maxLon: -52.5, minLat: -55.5, maxLat: -21.5 };
+
+  // Argentina outline — (lon, lat) clockwise, forma reconocible
+  const ARG_OUTLINE = [
+    [-69.5,-21.9],  // NW Jujuy
+    [-65.7,-22.0],  // N Salta/Bolivia
+    [-62.6,-22.0],  // N Chaco/Bolivia
+    [-60.0,-22.0],  // N Formosa/Paraguay
+    [-57.7,-22.2],  // NE Paraguay border
+    [-57.5,-25.5],  // Corrientes/Paraguay
+    [-55.7,-27.4],  // Corrientes NE
+    [-53.6,-26.2],  // Misiones tip (punta NE)
+    [-53.9,-28.2],  // Misiones SE
+    [-55.1,-29.5],  // Entre Ríos
+    [-56.0,-32.0],  // Uruguay border
+    [-57.8,-34.9],  // Río de la Plata / Buenos Aires
+    [-56.7,-36.5],  // BA costa
+    [-57.5,-38.0],  // BA provincia costera
+    [-57.5,-40.6],  // BA sur
+    [-62.5,-41.0],  // Patagonia norte Atlántico
+    [-63.5,-43.5],  // Chubut
+    [-65.1,-45.0],  // Chubut sur
+    [-66.0,-47.2],  // Santa Cruz norte
+    [-66.5,-49.5],  // Santa Cruz
+    [-67.5,-51.5],  // Santa Cruz sur
+    [-69.0,-52.0],  // Estrecho de Magallanes
+    [-68.5,-54.9],  // TdF norte
+    [-65.1,-55.1],  // TdF sur/este
+    [-66.4,-53.4],  // TdF norte costa
+    [-68.0,-51.9],  // Patagonia sur
+    [-69.0,-48.5],  // Santa Cruz oeste
+    [-71.1,-45.0],  // Andes Neuquén sur
+    [-72.3,-42.0],  // Andes Chubut
+    [-71.5,-37.0],  // Andes Neuquén norte
+    [-70.0,-29.5],  // Andes La Rioja/Mendoza
+    [-69.2,-25.0],  // Andes Salta
+    [-68.0,-22.9],  // Andes Jujuy
+    [-69.5,-21.9],  // cierre NW
+  ];
+
+  let geoCanvas, geoCtx, geoW, geoH, geoPoints = [], geoAnims = [];
+
+  function project(lon, lat) {
+    const x = (lon - GEO_BOUNDS.minLon) / (GEO_BOUNDS.maxLon - GEO_BOUNDS.minLon) * geoW;
+    const y = (GEO_BOUNDS.maxLat - lat) / (GEO_BOUNDS.maxLat - GEO_BOUNDS.minLat) * geoH;
+    return { x, y };
+  }
+
+  function toggleGeoMap() {
+    const widget = document.getElementById('geoWidget');
+    if (!widget) return;
+    const showing = widget.style.display !== 'none';
+    widget.style.display = showing ? 'none' : 'block';
+    if (!showing) { initGeoMap(); loadGeo(); }
+  }
+
+  function initGeoMap() {
+    geoCanvas = document.getElementById('geoCanvas');
+    if (!geoCanvas) return;
+    const ratio = window.devicePixelRatio || 1;
+    const cw    = 200; // fixed widget width
+    const lonSpan = GEO_BOUNDS.maxLon - GEO_BOUNDS.minLon;
+    const latSpan = GEO_BOUNDS.maxLat - GEO_BOUNDS.minLat;
+    const ch    = Math.round(cw * (latSpan / lonSpan));
+    geoCanvas.width  = cw * ratio;
+    geoCanvas.height = ch * ratio;
+    geoCanvas.style.height = ch + 'px';
+    geoW = cw * ratio;
+    geoH = ch * ratio;
+    geoCtx = geoCanvas.getContext('2d');
+    geoCtx.scale(ratio, ratio);
+    geoW = cw; geoH = ch;
+    drawMap();
+  }
+
+  function drawMap() {
+    if (!geoCtx) return;
+    const ctx = geoCtx;
+    ctx.clearRect(0, 0, geoW, geoH);
+
+    // Background
+    ctx.fillStyle = '#0f1923';
+    ctx.fillRect(0, 0, geoW, geoH);
+
+    // Grid lines (subtle)
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 1;
+    for (let lat = -60; lat <= -20; lat += 5) {
+      const { y } = project(-73.6, lat);
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(geoW, y); ctx.stroke();
+    }
+    for (let lon = -75; lon <= -50; lon += 5) {
+      const { x } = project(lon, -21.7);
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, geoH); ctx.stroke();
+    }
+
+    // Argentina fill
+    ctx.beginPath();
+    ARG_OUTLINE.forEach(([lon, lat], i) => {
+      const { x, y } = project(lon, lat);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fillStyle   = 'rgba(0,210,106,0.07)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,210,106,0.35)';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+
+  }
+
+  function drawDots(now) {
+    if (!geoCtx) return;
+    drawMap();
+    const ctx = geoCtx;
+
+    geoAnims = geoAnims.filter(a => now - a.born < a.life);
+
+    geoAnims.forEach(a => {
+      const age  = (now - a.born) / a.life;
+      const fade = age < 0.2 ? age / 0.2 : age > 0.7 ? 1 - (age - 0.7) / 0.3 : 1;
+      const { x, y } = project(a.lng, a.lat);
+
+      // Pulse ring
+      const ring = age * a.life / 300;
+      if (ring < 18) {
+        ctx.beginPath();
+        ctx.arc(x, y, 4 + ring, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0,210,106,${0.4 * (1 - ring / 18) * fade})`;
+        ctx.lineWidth   = 1;
+        ctx.stroke();
+      }
+
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, 4);
+      g.addColorStop(0, `rgba(255,255,255,${fade})`);
+      g.addColorStop(1, `rgba(0,210,106,${0.8 * fade})`);
+      ctx.fillStyle = g;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(t => drawDots(t));
+  }
+
+  let geoRafRunning = false;
+
+  async function loadGeo() {
+    const { ok, points } = await authFetch('/api/admin/geo');
+    if (!ok || !points?.length) return;
+
+    // Live indicator
+    const dot  = document.getElementById('geoLiveDot');
+    const text = document.getElementById('geoLiveText');
+    if (dot)  { dot.style.background = '#00d26a'; dot.style.boxShadow = '0 0 6px #00d26a'; }
+    if (text) text.textContent = `${points.length} visitas (5 min)`;
+
+    // Animar todos los puntos (son todos de los últimos 5 min)
+    const now = performance.now();
+    points.forEach(p => {
+      if (!geoAnims.find(a => Math.abs(a.lat - p.lat) < 0.01 && Math.abs(a.lng - p.lng) < 0.01)) {
+        geoAnims.push({ lat: p.lat, lng: p.lng, born: now, life: 16000 + Math.random() * 4000 });
+      }
+    });
+
+    if (!geoRafRunning) {
+      geoRafRunning = true;
+      requestAnimationFrame(t => drawDots(t));
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     await supabaseClient.auth.signOut();
@@ -291,16 +1127,27 @@
   });
 
   (async () => {
+    // Auth — sí redirige si falla
     try {
       await initSupabase();
       await checkAuth();
-      await Promise.all([loadStats(), loadCVs(), loadActive()]);
-      // Refresh active visitors every 30s
-      setInterval(loadActive, 30000);
     } catch (err) {
-      console.error('[admin init]', err);
+      console.error('[admin auth]', err);
       redirect();
+      return;
     }
+    // Date filter init
+    const today = new Date();
+    const fmt = d => d.toISOString().slice(0, 10);
+    filterFrom = filterTo = fmt(today);
+    document.querySelectorAll('.df-preset').forEach(b => b.classList.toggle('active', b.dataset.preset === 'today'));
+    // Carga de datos — errores no redirigen
+    await Promise.all(
+      [loadStats(), loadUTM(), loadLocations(), loadCVs(), loadActive()]
+        .map(p => p.catch(e => console.error('[admin load]', e)))
+    );
+    setInterval(loadActive, 30000);
+    setInterval(loadGeo, 15000);
   })();
 </script>
 </body>

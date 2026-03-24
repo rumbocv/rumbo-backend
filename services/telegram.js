@@ -4,7 +4,7 @@ async function sendTelegram(message) {
 
   if (!token || !chatId) {
     console.warn('[telegram] Credenciales no configuradas — notificación omitida.');
-    return;
+    return { ok: false, error: 'Credenciales no configuradas en variables de entorno.' };
   }
 
   try {
@@ -15,8 +15,10 @@ async function sendTelegram(message) {
     });
     const data = await res.json();
     if (!data.ok) console.error('[telegram] Error:', data.description);
+    return data;
   } catch (err) {
     console.error('[telegram] fetch error:', err.message);
+    return { ok: false, error: err.message };
   }
 }
 

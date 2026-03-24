@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>¡Listo! — Rumbo</title>
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '904043962618454');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=904043962618454&ev=PageView&noscript=1"/>
+  </noscript>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-font-smoothing: antialiased; }
@@ -251,18 +267,24 @@
       </div>
     </div>
 
-    <h1>¡Listo. Tomaste la mejor decisión para tu carrera.</h1>
-    <p class="subtitle">En menos de 24 horas tenés en tu bandeja el informe completo de tu CV.</p>
-    <p class="green-line">Revisá el email — llega antes de que te des cuenta.</p>
+    <h1>¡Pago confirmado! Tu CV optimizado llega en menos de 24 horas.</h1>
+    <p class="subtitle">Nuestro equipo ya está trabajando en tu CV. En menos de 24 horas recibís en tu email el informe completo y tu CV corregido, listo para enviar.</p>
+    <p class="green-line">Completá tus datos abajo para que podamos enviártelo.</p>
 
     <div class="order-badge" id="order-badge" style="display:none">
       Pedido <span id="order-number"></span>
     </div>
 
     <form id="contact-form">
-      <div>
-        <label for="name">Nombre</label>
-        <input type="text" id="name" name="name" placeholder="Ej: Valentina Rodríguez" required autocomplete="name">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div>
+          <label for="name">Nombre</label>
+          <input type="text" id="name" name="name" placeholder="Ej: Valentina" required autocomplete="given-name">
+        </div>
+        <div>
+          <label for="apellido">Apellido</label>
+          <input type="text" id="apellido" name="apellido" placeholder="Ej: Rodríguez" required autocomplete="family-name">
+        </div>
       </div>
       <div>
         <label for="email">Email</label>
@@ -292,14 +314,33 @@
 
     if (!sessionId) window.location.replace('/');
 
+    // Mark as paid in localStorage so landing recognizes returning user
+    try {
+      localStorage.setItem('rumbo_paid', JSON.stringify({ sessionId, ts: Date.now() }));
+      localStorage.removeItem('rumbo_partial');
+      localStorage.removeItem('rumbo_file_fp');
+    } catch(e) {}
+
+    // Meta Pixel — fire Purchase event once per session
+    (function firePixelPurchase() {
+      const key = `rumbo_pixel_purchase_${sessionId}`;
+      try { if (localStorage.getItem(key)) return; } catch(e) {}
+      if (typeof fbq === 'function') {
+        fbq('track', 'Purchase', { currency: 'ARS', value: 0 });
+      }
+      try { localStorage.setItem(key, '1'); } catch(e) {}
+    })();
+
+
     document.getElementById('contact-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name  = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const btn   = document.getElementById('submit-btn');
-      const errEl = document.getElementById('error-msg');
+      const name     = document.getElementById('name').value.trim();
+      const apellido = document.getElementById('apellido').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const btn      = document.getElementById('submit-btn');
+      const errEl    = document.getElementById('error-msg');
 
-      if (!name || !email) return;
+      if (!name || !apellido || !email) return;
 
       btn.disabled    = true;
       btn.textContent = 'Enviando…';
@@ -309,7 +350,7 @@
         const res  = await fetch(`${API_URL}/api/contact`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ sessionId, name, email }),
+          body:    JSON.stringify({ sessionId, name, apellido, email }),
         });
         const data = await res.json();
 

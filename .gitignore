@@ -2,3 +2,5 @@ node_modules/
 .env
 .env.swp
 .env.swo
+.vercel
+.env.prod
